@@ -89,14 +89,12 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
   const n = new NotePM(options.accessToken, options.team);
   await q.load();
   // ブラウザを立ち上げて画像をダウンロード
-  /*
   console.log('ブラウザを立ち上げます。Qiita Teamへログインしてください');
   await q.open();
   await q.downloadImage();
   // await q.downloadAttachment();
   q.close();
   console.log('画像をダウンロードしました');
-  */
   console.log('ユーザ一覧を読み込みます');
   await n.getUsers();
   config.users.forEach(u => {
