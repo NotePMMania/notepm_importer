@@ -89,13 +89,15 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
   const n = new NotePM(options.accessToken, options.team);
   await q.load();
   // ブラウザを立ち上げて画像をダウンロード
-  
+  /*
+  console.log('ブラウザを立ち上げます。Qiita Teamへログインしてください');
   await q.open();
   await q.downloadImage();
   // await q.downloadAttachment();
   q.close();
-  
-
+  console.log('画像をダウンロードしました');
+  */
+  console.log('ユーザ一覧を読み込みます');
   await n.getUsers();
   config.users.forEach(u => {
     n.users.push(new User({
@@ -103,14 +105,19 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
       name: u.id,
     }));  
   });
+  console.log('ユーザ一覧の読み込み完了');
 
   // タグを準備
+  console.log('タグを準備します');
   await prepareTag(n, q);
+  console.log('グループがない記事を取り込む用のノートを準備します');
   const baseNote = await createImportNote();
   // プロジェクト記事の取り込み
+  console.log('プロジェクト記事をインポートします');
   if (q.projects) executeProject(q);
 
   // グループごとにノートを作成
+  console.log('グループのノートを作成します');
   const groups = await Promise.all(q.groups.map(async g => {
     const note = new Note({
       name: g.name,
@@ -123,50 +130,63 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
         note.users?.push(user!);
       }
     });
+    console.log(`  ${g.name}を作成します`);
     await note.save();
     return note;
   }));
-  const pages = await Promise.all(q.articles.map(async a => {
+
+  console.log('ページを作成します');
+  for (const a of q.articles) {
     const page = new Page({
       title: a.title,
       body: a.body,
       memo: 'Qiita::Teamからインポートしました',
     });
-
+    console.log(`  タイトル：${page.title} `);
     if (a.group) {
       page.note_code = groups.filter(g => g.name === a.group?.name)[0].note_code;
     } else {
       page.note_code = baseNote.note_code;
     }
+    console.log(`    ノートコードは${page.note_code}になります`);
     if (a.tags) {
       a.tags.forEach(t => page.tags?.push(t.name));
     }
     if (a.user) {
       page.user = n.findUser(a.user.id);
     }
+    console.log(`    ノートを保存します`);
     await page.save();
+    console.log(`    ノートを保存しました ${page.page_code}`);
+    if (page.hasImage()) {
+      console.log(`    画像があります。ページ内容を更新します`);
+      await page.updateImageBody(q);
+      console.log(`    画像のURLに合わせてページ内容を更新しました`);
+    }
 
     // コメントの反映
     if (a.comments?.length! > 0) {
+      if (!page.page_code) {
+        // console.error(`データがありません： ${JSON.stringify(a)}`);
+        console.log(`データがありません ${page.title} : ${a.title}`);
+        return;
+      }
+      console.log(`  コメントがあります（ページコード： ${page.page_code}） ${page.title}`);
       a.comments!.forEach(async c => {
         const comment = new Comment({
           page_code: page.page_code!,
           body: c.body
         });
+        console.log(`  コメントを保存します`);
         await comment.save();
         if (comment.images().length > 0) {
+          console.log(`  コメントに画像があります。内容を更新します`);
           await comment.updateImageBody(q, page);
         }
       });
     }
-    return page;
-  }));
-
-  // 画像添付の反映
-  await Promise.all(pages.map(async page => {
-    if (!page.hasImage()) return;
-    return await page.updateImageBody(q);
-  }));
+  }
+  console.log('インポート終了しました');
 })(options);
 
 

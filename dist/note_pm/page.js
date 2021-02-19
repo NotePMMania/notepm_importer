@@ -70,7 +70,7 @@ class Page {
             tags: this.tags,
         });
         if (response.messages)
-            throw new Error(response.messages.join(','));
+            throw new Error(`Error: ${response.messages.join(', ')} page_code ${this.page_code}`);
         return await response.page;
     }
     async update() {
@@ -84,7 +84,7 @@ class Page {
         });
         if (response.messages)
             throw new Error(`Error: ${response.messages.join(', ')} page_code ${this.page_code}`);
-        return await response;
+        return await response.page;
     }
     hasImage() {
         const images = this.images();
@@ -103,19 +103,16 @@ class Page {
     }
     async updateImageBody(q) {
         const images = this.images();
-        const urls = await Promise.all(images.map(url => {
-            return new Promise((res, rej) => {
-                const filePath = q.filePath(url);
-                const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
-                attachment_1.default.add(this, fileName, filePath)
-                    .then(attachment => {
-                    res({
-                        url,
-                        download_url: `https://${Page.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
-                    });
-                });
+        const urls = [];
+        for (const url of images) {
+            const filePath = q.filePath(url);
+            const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
+            const attachment = await attachment_1.default.add(this, fileName, filePath);
+            urls.push({
+                url,
+                download_url: `https://${Page.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
             });
-        }));
+        }
         urls.forEach(params => {
             const r = new RegExp(params.url, 'gs');
             this.body = this.body.replace(r, params.download_url);

@@ -23,10 +23,13 @@ const options = program.opts();
   const n = new NotePM(options.accessToken, options.team);
   const notes = await Note.fetchAll();
   if (!notes) return;
-  if (notes.length === 0) return;
-  await Promise.all(notes.forEach(async n => {
-    await n.delete();
-  }));
+  if (notes.length > 0) {
+    console.log(`ノートが ${notes.length}件あります`);
+    await Promise.all(notes.map(async n => {
+      await n.delete();
+    }));
+  }
+  console.log(`終了しました`);
 })(options);
 
 

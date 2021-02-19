@@ -75,7 +75,7 @@ class Page {
       user: Page.NotePM.findUser(this.user) || 'NotePM-bot',
       tags: this.tags,
     });
-    if (response.messages) throw new Error(response.messages.join(','));
+    if (response.messages) throw new Error(`Error: ${response.messages.join(', ')} page_code ${this.page_code}`);
     return await response.page as notePM_Page;
   }
 
@@ -90,7 +90,7 @@ class Page {
       tags: this.tags,
     });
     if (response.messages) throw new Error(`Error: ${response.messages.join(', ')} page_code ${this.page_code}`);
-    return await response as notePM_Page;
+    return await response.page as notePM_Page;
   }
 
   hasImage(): boolean {
@@ -114,19 +114,16 @@ class Page {
 
   async updateImageBody(q: QiitaTeam): Promise<void> {
     const images = this.images();
-    const urls: notePM_UploadImage[] = await Promise.all(images.map(url => {
-      return new Promise((res, rej) => {
-        const filePath = q.filePath(url);
-        const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
-        Attachment.add(this, fileName, filePath)
-          .then(attachment => {
-            res({
-              url,
-              download_url: `https://${Page.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
-            });
-          });
+    const urls: notePM_UploadImage[] = [];
+    for (const url of images) {
+      const filePath = q.filePath(url);
+      const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
+      const attachment = await Attachment.add(this, fileName, filePath);
+      urls.push({
+        url,
+        download_url: `https://${Page.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
       });
-    }));
+    }
     urls.forEach(params => {
       const r = new RegExp(params.url, 'gs');
       this.body = this.body.replace(r, params.download_url);

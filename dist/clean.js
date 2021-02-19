@@ -34,9 +34,11 @@ const options = commander_1.program.opts();
     const notes = await note_pm_1.Note.fetchAll();
     if (!notes)
         return;
-    if (notes.length === 0)
-        return;
-    await Promise.all(notes.forEach(async (n) => {
-        await n.delete();
-    }));
+    if (notes.length > 0) {
+        console.log(`ノートが ${notes.length}件あります`);
+        await Promise.all(notes.map(async (n) => {
+            await n.delete();
+        }));
+    }
+    console.log(`終了しました`);
 })(options);
