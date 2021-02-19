@@ -102,13 +102,10 @@ const prepareTag = async (n, q) => {
     const n = new note_pm_1.default(options.accessToken, options.team);
     await q.load();
     // ブラウザを立ち上げて画像をダウンロード
-    /*
     await q.open();
-    console.log(q.getImage());
     await q.downloadImage();
     // await q.downloadAttachment();
     q.close();
-    */
     await n.getUsers();
     config.users.forEach(u => {
         n.users.push(new user_1.default({

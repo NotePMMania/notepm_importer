@@ -21,12 +21,15 @@ const options = program.opts();
 
 (async (options) => {
   const n = new NotePM(options.accessToken, options.team);
-  const notes = await Note.fetchAll();
-  if (!notes) return;
-  if (notes.length === 0) return;
-  await Promise.all(notes.forEach(async n => {
-    await n.delete();
-  }));
+  const users = await User.fetchAll();
+  if (!users) return;
+  if (users.length === 0) return;
+  console.log('users:');
+  users.forEach(u => console.log(`  -
+    id:
+    name: ${u.name}
+    user_code: "${u.user_code}"
+  `));
 })(options);
 
 

@@ -45,11 +45,9 @@ class Comment {
   }
 
   async update(): Promise<Comment> {
-    console.log(`/pages/${this.page_code}/comments/${this.comment_number}`);
     const response = await Comment.NotePM.fetch('PATCH', `/pages/${this.page_code}/comments/${this.comment_number}`, {
       body: this.body
     });
-    console.log(response);
     const params = response.comment as notePM_Comment;
     this.setParams(params);
     return this;
