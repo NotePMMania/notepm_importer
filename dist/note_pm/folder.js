@@ -5,9 +5,16 @@ class Folder {
         this.folder_id = 0;
         this.name = '';
         this.parent_folder_id = null;
+        this.setParams(params);
+    }
+    setParams(params) {
         this.folder_id = params.folder_id;
-        this.name = params.name;
+        this.name = params.name.normalize('NFC');
         this.parent_folder_id = params.parent_folder_id;
+    }
+    async save(note) {
+        const params = await this.create(note);
+        this.setParams(params);
     }
     async findOrCreate(note, name, parentFolder) {
         const folder = await this.find(note, name);
@@ -20,12 +27,12 @@ class Folder {
         const params = response1.folders.filter(folder => folder.name === name)[0];
         return params ? new Folder(params) : undefined;
     }
-    async create(note, name, parentFolder) {
+    async create(note) {
         const response = await Folder.NotePM.fetch('POST', `/notes/${note.note_code}/folders`, {
-            name,
-            parent_folder_id: parentFolder ? parentFolder.folder_id : null
+            name: this.name,
+            parent_folder_id: this.parent_folder_id
         });
-        return new Folder(response);
+        return response.folder;
     }
 }
 exports.default = Folder;

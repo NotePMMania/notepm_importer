@@ -91,9 +91,9 @@ type notePM_Page = {
 };
 
 type notePM_Folder = {
-  folder_id: number;
+  folder_id?: number;
   name: string;
-  parent_folder_id: number | null;
+  parent_folder_id?: number | null;
 };
 
 type notePM_Tag = {
@@ -132,4 +132,9 @@ type Config = {
     name: string;
     user_code: string;
   }[]
+}
+
+type Esa_Dir = {
+  name: string;
+  dirs?: Esa_Dir[];
 }

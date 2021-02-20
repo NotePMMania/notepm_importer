@@ -16,10 +16,6 @@ class Tag {
     }
   }
 
-  async add(name: string) {
-
-  }
-
   async save(): Promise<Tag> {
     const response = await Tag.NotePM.fetch('POST', `/tags`, {
       name: this.name,

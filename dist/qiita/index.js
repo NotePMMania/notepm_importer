@@ -11,7 +11,6 @@ const util_1 = require("util");
 const article_1 = __importDefault(require("./article"));
 const group_1 = __importDefault(require("./group"));
 const project_1 = __importDefault(require("./project"));
-const sleep = (msec) => new Promise(resolve => setTimeout(resolve, msec));
 class QiitaTeam {
     constructor(domain, dir) {
         this.domain = '';

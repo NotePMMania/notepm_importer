@@ -85,5 +85,6 @@ export {
   Tag,
   Note,
   User,
-  Comment
+  Comment,
+  Attachment
 };

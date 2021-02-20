@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Comment = exports.User = exports.Note = exports.Tag = exports.Page = exports.Folder = void 0;
+exports.Attachment = exports.Comment = exports.User = exports.Note = exports.Tag = exports.Page = exports.Folder = void 0;
 const folder_1 = __importDefault(require("./folder"));
 exports.Folder = folder_1.default;
 const page_1 = __importDefault(require("./page"));
@@ -17,6 +17,7 @@ const node_fetch_1 = __importDefault(require("node-fetch"));
 const user_1 = __importDefault(require("./user"));
 exports.User = user_1.default;
 const attachment_1 = __importDefault(require("./attachment"));
+exports.Attachment = attachment_1.default;
 const comment_1 = __importDefault(require("./comment"));
 exports.Comment = comment_1.default;
 class NotePM {

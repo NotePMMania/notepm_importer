@@ -4,7 +4,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const program = new commander_1.Command();
 program
-    .command('qiita [directory_path]', 'Import from Qiita::Team')
-    .command('clean [directory_path]', 'Clean data')
+    .command('qiita [options]', 'Import from Qiita::Team')
+    .command('esa [options]', 'Import from Esa')
+    .command('clean [options]', 'Clean data')
     .command('users', 'Output users data');
 program.parse();

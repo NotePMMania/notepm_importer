@@ -7,8 +7,6 @@ import Article from './article';
 import Group from './group';
 import Project from './project';
 
-const sleep = (msec:number) => new Promise(resolve => setTimeout(resolve, msec));
-
 class QiitaTeam {
   public domain = '';
   public dir = '';

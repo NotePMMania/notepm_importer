@@ -7,7 +7,8 @@
     "notepm": "dist/index.js",
     "notepm-qiita": "dist/qiita.js",
     "notepm-clean": "dist/clean.js",
-    "notepm-users": "dist/users.js"
+    "notepm-users": "dist/users.js",
+    "notepm-esa": "dist/esa.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -23,6 +24,7 @@
     "js-yaml": "^4.0.0",
     "locate-chrome": "^0.1.1",
     "node-fetch": "^2.6.1",
+    "parse-md": "^2.0.4",
     "puppeteer-core": "^7.1.0"
   },
   "devDependencies": {

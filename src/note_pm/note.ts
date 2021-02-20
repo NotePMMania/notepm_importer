@@ -53,9 +53,7 @@ class Note {
 
   async create(name: string, description: string, scope: string, users: string[]): Promise<notePM_Note> {
     const response = await Note.NotePM.fetch('POST', '/notes', { name, description, scope, users });
-    if (response.messages) {
-      throw new Error(`Note creating error. ${response.messages.join(',')}`);
-    }
+    if (response.messages) throw new Error(`Note creating error. ${response.messages.join(',')}`);
     return response.note as notePM_Note;
   }
 
@@ -71,6 +69,7 @@ class Note {
   static async fetchAll(page = 1): Promise<Note[]> {
     const perPage = 100;
     const res = await Note.NotePM.fetch('GET', `/notes?page=${page}&per_page=${perPage}`);
+    if (res.messages) throw new Error(`Note fetchAll error. ${res.messages.join(',')}`);
     let notes = (res.notes as notePM_Page[]).map(t => new Note(t));
     if (notes.length > perPage) {
       const nextNotes = await Note.fetchAll(page + 1);

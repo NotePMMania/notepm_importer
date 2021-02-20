@@ -12,8 +12,6 @@ class Tag {
             this.page_count = params.page_count;
         }
     }
-    async add(name) {
-    }
     async save() {
         const response = await Tag.NotePM.fetch('POST', `/tags`, {
             name: this.name,
