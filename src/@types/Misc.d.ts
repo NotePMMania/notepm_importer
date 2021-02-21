@@ -94,6 +94,7 @@ type notePM_Folder = {
   folder_id?: number;
   name: string;
   parent_folder_id?: number | null;
+  note_code?: string;
 };
 
 type notePM_Tag = {
@@ -123,7 +124,7 @@ type notePM_Comment = {
   note_code?: string;
   created_at?: string;
   updated_at?: string;
-  user?: notePM_User;
+  user?: notePM_User | string;
 }
 
 type Config = {

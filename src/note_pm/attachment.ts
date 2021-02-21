@@ -30,6 +30,7 @@ class Attachment {
   }
 
   static async add(page: Page, fileName: string, filePath: string): Promise<Attachment> {
+    const stat = await promisify(fs.stat)(filePath);
     const readStream = fs.createReadStream(filePath);
     const formData = new FormData;
     formData.append('file[name]', fileName);

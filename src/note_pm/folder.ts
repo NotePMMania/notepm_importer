@@ -6,15 +6,17 @@ class Folder {
   public folder_id: number = 0;
   public name: string = '';
   public parent_folder_id: number | null = null;
+  public note_code = '';
 
   constructor(params: notePM_Folder) {
     this.setParams(params);
   }
 
   setParams(params: notePM_Folder) {
-    this.folder_id = params.folder_id;
+    if (params.folder_id) this.folder_id = params.folder_id;
     this.name = params.name.normalize('NFC');
-    this.parent_folder_id = params.parent_folder_id;
+    if (params.parent_folder_id) this.parent_folder_id = params.parent_folder_id;
+    if (params.note_code) this.note_code = params.note_code;
   }
 
   async save(note: Note): Promise<void> {
@@ -41,6 +43,7 @@ class Folder {
       name: this.name,
       parent_folder_id: this.parent_folder_id
     });
+    if (response.messages) throw new Error(`Error: ${response.messages.join(', ')} page_code ${this.page_code}`);
     return response.folder;
   }
 }

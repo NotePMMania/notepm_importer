@@ -60,13 +60,14 @@ class Page {
         return this;
     }
     async create() {
+        const user = Page.NotePM.findUser(this.user);
         const response = await Page.NotePM.fetch('POST', `/pages`, {
             note_code: this.note_code,
             folder_id: this.folder_id,
             title: this.title,
             body: this.body,
             memo: this.memo,
-            user: Page.NotePM.findUser(this.user) || 'NotePM-bot',
+            user: user || 'NotePM-bot',
             tags: this.tags,
         });
         if (response.messages)
@@ -74,12 +75,14 @@ class Page {
         return await response.page;
     }
     async update() {
+        const user = Page.NotePM.findUser(this.user);
         const response = await Page.NotePM.fetch('PATCH', `/pages/${this.page_code}`, {
             note_code: this.note_code,
             folder_id: this.folder_id,
             title: this.title,
             body: this.body,
             memo: this.memo,
+            user: user || 'NotePM-bot',
             tags: this.tags,
         });
         if (response.messages)
@@ -92,8 +95,8 @@ class Page {
     }
     images() {
         const ary = this.body.replace(/.*?!\[.*?\]\((.*?)\).*?/gs, "$1\n").split(/\n/);
-        const ary2 = this.body.replace(/.*?<img .*?src="(.*?)".*?>.*?/gs, "$1\n").split(/\n/);
-        return ary.concat(ary2).filter(s => s.match(/^http.?:\/\//));
+        const ary2 = this.body.replace(/.*?<img .*?src=("|')(.*?)("|').*?>.*?/gs, "$2\n").split(/\n/);
+        return ary.concat(ary2).filter(s => s.match(/^(http.?:\/\/|\.\.)/));
     }
     async findOrCreate(note, title, body, memo, tags, folder) {
         const response1 = await Page.NotePM.fetch('GET', `/pages`);
@@ -101,11 +104,12 @@ class Page {
         if (page)
             return page;
     }
-    async updateImageBody(q) {
+    async updateImageBody(q, dir = '') {
         const images = this.images();
         const urls = [];
         for (const url of images) {
-            const filePath = q.filePath(url);
+            console.log(`    ${this.title}に画像をアップロードします。 ${dir}${url}`);
+            const filePath = q ? q.filePath(url) : `${dir}${url}`;
             const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
             const attachment = await attachment_1.default.add(this, fileName, filePath);
             urls.push({

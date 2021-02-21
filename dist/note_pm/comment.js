@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const attachment_1 = __importDefault(require("./attachment"));
+const page_1 = __importDefault(require("./page"));
 class Comment {
     constructor(params) {
         this.page_code = '';
@@ -20,8 +21,8 @@ class Comment {
     }
     images() {
         const ary = this.body.replace(/.*?!\[.*?\]\((.*?)\).*?/gs, "$1\n").split(/\n/);
-        const ary2 = this.body.replace(/.*?<img .*?src="(.*?)".*?>.*?/gs, "$1\n").split(/\n/);
-        return ary.concat(ary2).filter(s => s.match(/^http.?:\/\//));
+        const ary2 = this.body.replace(/.*?<img .*?src=("|')(.*?)("|').*?>.*?/gs, "$2\n").split(/\n/);
+        return ary.concat(ary2).filter(s => s.match(/^(http.?:\/\/|\.\.)/));
     }
     async save() {
         if (this.comment_number) {
@@ -47,21 +48,18 @@ class Comment {
         this.setParams(params);
         return this;
     }
-    async updateImageBody(q, page) {
+    async updateImageBody(q, page, dir = '') {
         const images = this.images();
-        const urls = await Promise.all(images.map(url => {
-            return new Promise((res, rej) => {
-                const filePath = q.filePath(url);
-                const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
-                attachment_1.default.add(page, fileName, filePath)
-                    .then(attachment => {
-                    res({
-                        url,
-                        download_url: `https://${Comment.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
-                    });
-                });
+        const urls = [];
+        for (const url of images) {
+            const filePath = q ? q.filePath(url) : `${dir}${url}`;
+            const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
+            const attachment = await attachment_1.default.add(page, fileName, filePath);
+            urls.push({
+                url,
+                download_url: `https://${page_1.default.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
             });
-        }));
+        }
         urls.forEach(params => {
             const r = new RegExp(params.url, 'gs');
             this.body = this.body.replace(r, params.download_url);

@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = __importDefault(require("fs"));
+const util_1 = require("util");
 const form_data_1 = __importDefault(require("form-data"));
 class Attachment {
     constructor(params) {
@@ -26,6 +27,7 @@ class Attachment {
         this.created_at = params.created_at;
     }
     static async add(page, fileName, filePath) {
+        const stat = await util_1.promisify(fs_1.default.stat)(filePath);
         const readStream = fs_1.default.createReadStream(filePath);
         const formData = new form_data_1.default;
         formData.append('file[name]', fileName);

@@ -3,7 +3,7 @@ import locateChrome from 'locate-chrome';
 import fs from 'fs';
 import { promisify } from 'util';
 import crypto from 'crypto';
-import parseMD from 'parse-md'
+import parseMD from 'parse-md';
 
 class Esa {
   public domain = '';

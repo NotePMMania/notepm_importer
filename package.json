@@ -1,6 +1,6 @@
 {
   "name": "notepm_importer",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -8,7 +8,8 @@
     "notepm-qiita": "dist/qiita.js",
     "notepm-clean": "dist/clean.js",
     "notepm-users": "dist/users.js",
-    "notepm-esa": "dist/esa.js"
+    "notepm-esa": "dist/esa.js",
+    "notepm-kibela": "dist/kibela.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

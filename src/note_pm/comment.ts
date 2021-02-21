@@ -23,8 +23,8 @@ class Comment {
 
   images(): string[] {
     const ary = this.body.replace(/.*?!\[.*?\]\((.*?)\).*?/gs, "$1\n").split(/\n/);
-    const ary2 = this.body.replace(/.*?<img .*?src="(.*?)".*?>.*?/gs, "$1\n").split(/\n/);
-    return ary.concat(ary2).filter(s => s.match(/^http.?:\/\//));
+    const ary2 = this.body.replace(/.*?<img .*?src=("|')(.*?)("|').*?>.*?/gs, "$2\n").split(/\n/);
+    return ary.concat(ary2).filter(s => s.match(/^(http.?:\/\/|\.\.)/));
   }
 
   async save(): Promise<Comment> {
@@ -53,21 +53,18 @@ class Comment {
     return this;
   }
 
-  async updateImageBody(q: QiitaTeam, page: Page): Promise<void> {
+  async updateImageBody(q: QiitaTeam | null, page: Page, dir = ''): Promise<void> {
     const images = this.images();
-    const urls: notePM_UploadImage[] = await Promise.all(images.map(url => {
-      return new Promise((res, rej) => {
-        const filePath = q.filePath(url);
-        const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
-        Attachment.add(page, fileName, filePath)
-          .then(attachment => {
-            res({
-              url,
-              download_url: `https://${Comment.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
-            });
-          });
+    const urls: notePM_UploadImage[] = [];
+    for (const url of images) {
+      const filePath = q ? q.filePath(url) : `${dir}${url}`;
+      const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
+      const attachment = await Attachment.add(page, fileName, filePath);
+      urls.push({
+        url,
+        download_url: `https://${Page.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
       });
-    }));
+    }
     urls.forEach(params => {
       const r = new RegExp(params.url, 'gs');
       this.body = this.body.replace(r, params.download_url);

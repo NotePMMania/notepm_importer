@@ -8,6 +8,8 @@ import User from './user';
 import Attachment from './attachment';
 import Comment from './comment';
 
+const sleep = (msec: number) => new Promise(resolve => setTimeout(resolve, msec));
+
 class NotePM {
   public accessToken = '';
   public domain = '';
@@ -49,6 +51,7 @@ class NotePM {
     if (!(body instanceof FormData)) {
       headers['Content-Type'] = 'application/json';
     }
+    await sleep(1000);
     if (method === 'GET') {
       const res = await fetch(`${this.url}${path}`, { headers });
       return await res.json();

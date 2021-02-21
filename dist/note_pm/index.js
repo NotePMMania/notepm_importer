@@ -20,6 +20,7 @@ const attachment_1 = __importDefault(require("./attachment"));
 exports.Attachment = attachment_1.default;
 const comment_1 = __importDefault(require("./comment"));
 exports.Comment = comment_1.default;
+const sleep = (msec) => new Promise(resolve => setTimeout(resolve, msec));
 class NotePM {
     constructor(accessToken, domain) {
         this.accessToken = '';
@@ -55,6 +56,7 @@ class NotePM {
         if (!(body instanceof form_data_1.default)) {
             headers['Content-Type'] = 'application/json';
         }
+        await sleep(1000);
         if (method === 'GET') {
             const res = await node_fetch_1.default(`${this.url}${path}`, { headers });
             return await res.json();
