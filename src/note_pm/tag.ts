@@ -20,6 +20,7 @@ class Tag {
     const response = await Tag.NotePM.fetch('POST', `/tags`, {
       name: this.name,
     });
+    if (response.messages) throw new Error(`Error: ${response.messages.join(', ')} ${this.name}`);
     const params = response.tag as notePM_Tag;
     this.setParams(params);
     return this;

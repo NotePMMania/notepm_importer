@@ -138,6 +138,7 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
     const page = new Page({
       title: a.title,
       body: a.body,
+      created_at: new Date(a.created_at),
       memo: 'Qiita::Teamからインポートしました',
     });
     console.log(`  タイトル：${page.title} `);

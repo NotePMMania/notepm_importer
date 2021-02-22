@@ -135,6 +135,7 @@ const findNoteOrFolder = (dirs, category: string | null) => {
       body: params.content,
       note_code: note.note_code,
       folder_id: folder ? folder.folder_id : null,
+      created_at: new Date(metadata.created_at),
       tags,
       memo: '',
     });

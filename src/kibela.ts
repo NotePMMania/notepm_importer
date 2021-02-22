@@ -95,11 +95,13 @@ const findOrCreateFolder = async (note: Note, folders: Kibela_Folder[], paths: s
       console.log(`　　タイトル： ${title}`);
       console.log(`　　ノート： ${group} => ${note.name}`);
       console.log(`　　フォルダ： ${file.metadata.folder} => ${folder ? folder.name : 'なし'}, (${folder ? folder.folder_id : ''})`);
+      console.log(`    作成日： ${file.metadata.published_at}`);
       const page = new Page({
         title,
         body,
         folder_id: folder? folder.folder_id : null,
         note_code: note.note_code,
+        created_at: new Date(file.metadata.published_at),
         memo: ''
       });
       page.user = file.metadata.author;
