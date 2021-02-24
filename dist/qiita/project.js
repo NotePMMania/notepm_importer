@@ -35,6 +35,7 @@ class Project {
         return {
             title: this.name,
             body: this.body,
+            created_at: new Date(this.created_at),
             memo: ''
         };
     }

@@ -28,7 +28,7 @@ const fs_1 = __importDefault(require("fs"));
 const js_yaml_1 = __importDefault(require("js-yaml"));
 const note_pm_1 = __importStar(require("./note_pm/"));
 const util_1 = require("util");
-const index_1 = __importDefault(require("./kibela/index"));
+const index_1 = __importDefault(require("./docbase/index"));
 const dir = process.argv[process.argv.length - 1];
 commander_1.program
     .version('0.0.1')
@@ -38,38 +38,17 @@ commander_1.program
     .option('-u, --user-yaml [yamlPath]', 'ユーザ設定のファイルを指定してください')
     .parse();
 const options = commander_1.program.opts();
-const findOrCreateFolder = async (note, folders, paths, parentFolder = null) => {
-    let folder = folders.filter(f => f.folder.name === paths[0].normalize('NFC') && f.folder.note_code == note.note_code)[0];
-    if (!folder) {
-        const n = new note_pm_1.Folder({
-            name: paths[0].normalize('NFC'),
-            parent_folder_id: parentFolder ? parentFolder.folder_id : null,
-            note_code: note.note_code,
-        });
-        console.log(`　　存在しないフォルダを作成します`);
-        console.log(`　　ノート： ${note.name}`);
-        console.log(`　　フォルダ名： ${paths[0]}`);
-        await n.save(note);
-        folder = {
-            folder: n,
-            child: []
-        };
-        folders.push(folder);
-    }
-    if (paths.length === 1)
-        return folder.folder;
-    return findOrCreateFolder(note, folder.child, paths.splice(1), folder.folder);
-};
 (async (options) => {
     if (!options.accessToken)
         throw new Error('アクセストークンは必須です（-a ACCESS_TOKEN）');
     if (!options.team)
         throw new Error('チームドメインは必須です（-t TEAM_DOMAIN）');
     if (!options.path)
-        throw new Error('KibelaのZipを展開したディレクトリは必須です（-p PATH_TO_DIR）');
+        throw new Error('DocbaseのZipを展開したディレクトリは必須です（-p PATH_TO_DIR）');
     const n = new note_pm_1.default(options.accessToken, options.team);
-    const k = new index_1.default(options.path);
-    await k.loadFiles();
+    const d = new index_1.default(options.path);
+    await d.loadFiles();
+    const groups = ['ルート'].concat(Array.from(d.groups));
     const str = await util_1.promisify(fs_1.default.readFile)(options.userYaml, 'utf-8');
     const config = await js_yaml_1.default.load(str);
     await n.getUsers();
@@ -80,57 +59,65 @@ const findOrCreateFolder = async (note, folders, paths, parentFolder = null) => 
         }));
     });
     const notes = {};
-    for (const dir of Array.from(k.groups)) {
+    for (const dir of Array.from(groups)) {
         // ノートを準備する
         const note = new note_pm_1.Note({
             name: dir,
-            description: 'Kibelaからインポートしたノートです',
+            description: 'Docbaseからインポートしたノートです',
             scope: 'private'
         });
         await note.save();
         notes[note.name] = note;
     }
     // 記事を作成する
-    const folders = [];
-    for (const fileName in k.contents) {
-        const file = k.contents[fileName];
-        // 該当するノートを抽出
-        for (const group of file.metadata.groups) {
-            const note = notes[group];
-            // フォルダを確認
-            let folder = null;
-            if (file.metadata.folder) {
-                folder = await findOrCreateFolder(note, folders, file.metadata.folder.split('/'));
+    const tags = [];
+    for (const fileName in d.contents) {
+        const file = d.contents[fileName];
+        console.log(`    タグ作成開始`);
+        for (const tag of file.tags) {
+            if (tags.indexOf(tag.name) > -1)
+                continue;
+            console.log(`      タグ： ${tag.name}`);
+            const t = new note_pm_1.Tag({
+                name: tag.name,
+            });
+            try {
+                await t.save();
             }
-            const ary = file.content.split(/\n/);
-            const body = ary.slice(3).join("\n");
-            const title = ary.filter(s => s !== '')[0].replace(/^# /, '');
+            catch (e) {
+            }
+        }
+        console.log(`    タグ保存完了`);
+        // 該当するノートを抽出
+        if (file.groups.length === 0)
+            file.groups.push({ name: 'ルート' });
+        for (const group of file.groups) {
+            const note = notes[group.name];
+            const body = file.body;
+            const title = file.title;
             console.log('');
-            console.log(`　　タイトル： ${title}`);
-            console.log(`　　ノート： ${group} => ${note.name}`);
-            console.log(`　　フォルダ： ${file.metadata.folder} => ${folder ? folder.name : 'なし'}, (${folder ? folder.folder_id : ''})`);
-            console.log(`    作成日： ${file.metadata.published_at}`);
+            console.log(`    タイトル： ${title}`);
+            console.log(`    ノート： ${group.name} => ${note.name}`);
             const page = new note_pm_1.Page({
                 title,
                 body,
-                folder_id: folder ? folder.folder_id : null,
                 note_code: note.note_code,
-                created_at: new Date(file.metadata.published_at),
-                memo: ''
+                memo: '',
+                tags: file.tags,
+                created_at: new Date(file.created_at)
             });
-            page.user = file.metadata.author;
+            page.user = file.user.name;
             await page.save();
-            const directory = `${k.dir}/notes/${file.metadata.folder == null ? '' : file.metadata.folder + "/"}`;
-            await page.updateImageBody(null, directory);
+            await page.updateImageBody(null, `${d.dir}/attachments/`);
             // コメント投稿
-            if (file.metadata.comments) {
-                for (const c of file.metadata.comments) {
+            if (file.comments) {
+                for (const c of file.comments) {
                     const comment = new note_pm_1.Comment({
                         page_code: page.page_code,
-                        body: c.content
+                        body: c.body
                     });
                     await comment.save();
-                    await comment.updateImageBody(null, page, directory);
+                    await comment.updateImageBody(null, page, `${d.dir}/attachments/`);
                 }
             }
         }

@@ -5,6 +5,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 import QiitaTeam from '../qiita/index';
 import Attachment from './attachment';
+import dayjs from 'dayjs';
 
 class Page {
   static NotePM: NotePM;
@@ -15,7 +16,7 @@ class Page {
   public title = '';
   public body = '';
   public memo = '';
-  public created_at: string | undefined = '';
+  public created_at: Date | undefined = undefined;
   public updated_at: string | undefined = '';
   public created_by: User | null = null;
   public updated_by: User | null = null;
@@ -74,6 +75,7 @@ class Page {
       body: this.body,
       memo: this.memo,
       user: user || 'NotePM-bot',
+      created_at: dayjs(this.created_at).format('YYYY-MM-DD HH:mm:ss'),
       tags: this.tags,
     });
     if (response.messages) throw new Error(`Error: ${response.messages.join(', ')} page_code ${this.page_code}`);
@@ -104,7 +106,8 @@ class Page {
   images(): string[] {
     const ary = this.body.replace(/.*?!\[.*?\]\((.*?)\).*?/gs, "$1\n").split(/\n/);
     const ary2 = this.body.replace(/.*?<img .*?src=("|')(.*?)("|').*?>.*?/gs, "$2\n").split(/\n/);
-    return ary.concat(ary2).filter(s => s.match(/^(http.?:\/\/|\.\.)/));
+    const ary3 = this.body.replace(/\[!\[.*?\]\((\.\.\/attachments\/.*?)\)/gs, "$1\n").split(/\n/);
+    return ary.concat(ary2).concat(ary3).filter(s => s.match(/^(http.?:\/\/|\.\.)/));
   }
 
   async findOrCreate(note: notePM_Note, title: string, body: string, memo: string, tags: string[], folder?: notePM_Folder) {

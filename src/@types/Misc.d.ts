@@ -82,7 +82,7 @@ type notePM_Page = {
   title: string;
   body: string;
   memo: string;
-  created_at?: string;
+  created_at?: Date;
   updated_at?: string;
   created_by?: notePM_User;
   updated_by?: notePM_User;

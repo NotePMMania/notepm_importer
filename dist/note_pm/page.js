@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const user_1 = __importDefault(require("./user"));
 const attachment_1 = __importDefault(require("./attachment"));
+const dayjs_1 = __importDefault(require("dayjs"));
 class Page {
     constructor(params) {
         this.page_code = '';
@@ -13,7 +14,7 @@ class Page {
         this.title = '';
         this.body = '';
         this.memo = '';
-        this.created_at = '';
+        this.created_at = undefined;
         this.updated_at = '';
         this.created_by = null;
         this.updated_by = null;
@@ -68,6 +69,7 @@ class Page {
             body: this.body,
             memo: this.memo,
             user: user || 'NotePM-bot',
+            created_at: dayjs_1.default(this.created_at).format('YYYY-MM-DD HH:mm:ss'),
             tags: this.tags,
         });
         if (response.messages)
@@ -96,7 +98,8 @@ class Page {
     images() {
         const ary = this.body.replace(/.*?!\[.*?\]\((.*?)\).*?/gs, "$1\n").split(/\n/);
         const ary2 = this.body.replace(/.*?<img .*?src=("|')(.*?)("|').*?>.*?/gs, "$2\n").split(/\n/);
-        return ary.concat(ary2).filter(s => s.match(/^(http.?:\/\/|\.\.)/));
+        const ary3 = this.body.replace(/\[!\[.*?\]\((\.\.\/attachments\/.*?)\)/gs, "$1\n").split(/\n/);
+        return ary.concat(ary2).concat(ary3).filter(s => s.match(/^(http.?:\/\/|\.\.)/));
     }
     async findOrCreate(note, title, body, memo, tags, folder) {
         const response1 = await Page.NotePM.fetch('GET', `/pages`);
