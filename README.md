@@ -39,16 +39,76 @@ users:
 
 `NOTE_PM_SUBDOMAIN` はNotePMで利用しているサブドメインになります。たとえば `notepm` です。
 
-### 注意点
+## esaの場合
 
-- 実行時にWebブラウザ（Google Chrome）が開きます。あらかじめインストールが必要です。
-- Google Chromeが開いたら、Qiita Teamにログインしてください。ログイン情報を取得するようなことはしていませんのでご安心ください。
-- Qiita Teamにアップロードした画像はすべて（ページ内で使われているもののみ）ダウンロードし、NotePMへ移行します。
-- 添付ファイルは移行できません。ご注意ください。
-- プロジェクト内のコンテンツはプロジェクトというノート内に作成されます
-- グループが指定されているコンテンツはグループ名でノートを作成し、その中に作成されます
-- グループが指定されていないコンテンツはQiita::Teamからのインポート用というノートの中に作成されます
-- ノートはすべてプライベートで作成されます
+esaでエクスポートしたZipファイルを解凍（展開）してください。そのパスを `/path/to/exported_dir/` として指定します。
+
+```
+$ notepm esa \
+  -d ESA_DOMAIN \
+  -p /path/to/exported_dir/ \
+  -a ACCESS_TOKEN \
+  -t NOTE_PM_SUBDOMAIN
+```
+
+`ESA_DOMAIN` はesaの利用ドメインです。 notepm.esa.io のように指定します。
+
+`ACCESS_TOKEN` はNotePMで発行したアクセストークンになります。
+
+`NOTE_PM_SUBDOMAIN` はNotePMで利用しているサブドメインになります。たとえば `notepm` です。
+
+## Kibelaの場合
+
+KibelaでエクスポートしたZipファイルを解凍（展開）してください。そのパスを `/path/to/exported_dir/` として指定します。
+
+```
+$ notepm kibela \
+  -p /path/to/exported_dir/ \
+  -a ACCESS_TOKEN \
+  -t NOTE_PM_SUBDOMAIN \
+  -u PATH_TO_SETTING_YAML
+```
+
+`ACCESS_TOKEN` はNotePMで発行したアクセストークンになります。
+
+`NOTE_PM_SUBDOMAIN` はNotePMで利用しているサブドメインになります。たとえば `notepm` です。
+
+`PATH_TO_SETTING_YAML` は Qiita Teamの時と同じ手順で作成したKibelaとNotePMのユーザIDを突合するファイルです。KibelaのユーザIDは @ を付けてください。
+
+```yaml
+users:
+  -
+    id: "@taro"
+    name: プロジェクト太郎
+    user_code: "0000000001"
+  
+  -
+    id: "@hanako"
+    name: プロジェクト花子
+    user_code: "0000000002"
+```
+
+## DocBaseの場合
+
+DocBaseでエクスポートしたZipファイルを解凍（展開）してください。そのパスを `/path/to/exported_dir/` として指定します。
+
+```
+$ notepm docbase \
+  -p /path/to/exported_dir/ \
+  -a ACCESS_TOKEN \
+  -t NOTE_PM_SUBDOMAIN \
+  -u PATH_TO_SETTING_YAML
+```
+
+`ACCESS_TOKEN` はNotePMで発行したアクセストークンになります。
+
+`NOTE_PM_SUBDOMAIN` はNotePMで利用しているサブドメインになります。たとえば `notepm` です。
+
+`PATH_TO_SETTING_YAML` は Qiita Teamの時と同じ手順で作成したDocBaseとNotePMのユーザIDを突合するファイルです。
+
+## 注意点
+
+- Qiita Teamの場合、実行時にWebブラウザ（Google Chrome）が開きます。あらかじめインストールが必要です。
 
 ## フォルダを指定して取り込む場合
 

@@ -34,6 +34,8 @@ class Docbase {
     async loadFiles() {
         await this.loadImageFile();
         let dir = `${this.dir}/articles/`;
+        if (!dir.match(/.*\/$/))
+            dir = `${dir}/`;
         const ary = await util_1.promisify(fs_1.default.readdir)(dir);
         for (const filePath of ary) {
             if (filePath.match(/^\./))
