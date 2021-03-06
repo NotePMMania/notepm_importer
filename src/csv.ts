@@ -22,7 +22,7 @@ const options = program.opts();
   const n = new NotePM(options.accessToken, options.team);
   const note = new Note({
     name: 'インポート',
-    description: 'フォルダからインポートしたノート',
+    description: 'CSVからインポートしたノート',
     scope: 'private',
   });
   await note.save();
