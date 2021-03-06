@@ -16,6 +16,14 @@ class Docbase {
     }
     async loadImageFile() {
         let dir = `${this.dir}/attachments/`;
+        if (!dir.match(/.*\/$/))
+            dir = `${dir}/`;
+        try {
+            await util_1.promisify(fs_1.default.stat)(dir);
+        }
+        catch (e) {
+            throw new Error(`ディレクトリ ${dir} が存在しません`);
+        }
         const ary = await util_1.promisify(fs_1.default.readdir)(dir);
         for (const imagePath of ary) {
             if (imagePath.match(/^\./))
@@ -25,9 +33,7 @@ class Docbase {
     }
     async loadFiles() {
         await this.loadImageFile();
-        let dir = `${this.dir}/articles`;
-        if (!dir.match(/.*\/$/))
-            dir = `${dir}/`;
+        let dir = `${this.dir}/articles/`;
         const ary = await util_1.promisify(fs_1.default.readdir)(dir);
         for (const filePath of ary) {
             if (filePath.match(/^\./))

@@ -50,6 +50,52 @@ users:
 - グループが指定されていないコンテンツはQiita::Teamからのインポート用というノートの中に作成されます
 - ノートはすべてプライベートで作成されます
 
+## フォルダを指定して取り込む場合
+
+任意のフォルダ以下にあるファイルを取り込めます。インポート対象のディレクトリを `/path/to/import_dir/` で指定してください。
+
+```
+$ notepm file \
+  -p /path/to/import_dir/
+  -a ACCESS_TOKEN
+  -t NOTE_PM_SUBDOMAIN
+```
+
+`ACCESS_TOKEN` はNotePMで発行したアクセストークンになります。
+
+`NOTE_PM_SUBDOMAIN` はNotePMで利用しているサブドメインになります。たとえば `notepm` です。
+
+## CSVファイルからの取り込み
+
+CSVファイルを指定して取り込めます。対象のCSVファイルを `/path/to/csv_file` で指定してください。
+
+```
+$ notepm csv \
+  -p /path/to/csv_file
+  -a ACCESS_TOKEN
+  -t NOTE_PM_SUBDOMAIN
+```
+
+`ACCESS_TOKEN` はNotePMで発行したアクセストークンになります。
+
+`NOTE_PM_SUBDOMAIN` はNotePMで利用しているサブドメインになります。たとえば `notepm` です。
+
+## ワードファイルの取り込む
+
+Wordファイルの入っているフォルダを指定して取り込めます。インポート対象のディレクトリを `/path/to/import_dir/` で指定してください。
+
+```
+$ notepm word \
+  -p /path/to/import_dir/
+  -a ACCESS_TOKEN
+  -t NOTE_PM_SUBDOMAIN
+```
+
+`ACCESS_TOKEN` はNotePMで発行したアクセストークンになります。
+
+`NOTE_PM_SUBDOMAIN` はNotePMで利用しているサブドメインになります。たとえば `notepm` です。
+
+
 ## npm
 
 [notepm_importer - npm](https://www.npmjs.com/package/notepm_importer)

@@ -1,6 +1,6 @@
 {
   "name": "notepm_importer",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -10,7 +10,10 @@
     "notepm-users": "dist/users.js",
     "notepm-esa": "dist/esa.js",
     "notepm-kibela": "dist/kibela.js",
-    "notepm-docbase": "dist/docbase.js"
+    "notepm-docbase": "dist/docbase.js",
+    "notepm-file": "dist/file.js",
+    "notepm-word": "dist/word.js",
+    "notepm-csv": "dist/csv.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -24,12 +27,16 @@
     "commander": "^7.1.0",
     "dayjs": "^1.10.4",
     "form-data": "^4.0.0",
+    "iconv-lite": "^0.6.2",
     "js-yaml": "^4.0.0",
     "locate-chrome": "^0.1.1",
+    "mammoth": "^1.4.16",
     "markdown-it": "^12.0.4",
     "node-fetch": "^2.6.1",
+    "papaparse": "^5.3.0",
     "parse-md": "^2.0.4",
-    "puppeteer-core": "^7.1.0"
+    "puppeteer-core": "^7.1.0",
+    "turndown": "^7.0.0"
   },
   "devDependencies": {
     "@types/node": "^12.20.1",

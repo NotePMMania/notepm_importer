@@ -6,7 +6,6 @@ import yaml from 'js-yaml';
 import NotePM, {Note, Folder, Page, Tag, Comment, Attachment, User} from './note_pm/';
 import { promisify } from 'util';
 import Docbase from './docbase/index';
-import { exit } from 'process';
 
 const dir = process.argv[process.argv.length - 1];
 
