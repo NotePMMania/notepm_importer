@@ -106,10 +106,6 @@ $ notepm docbase \
 
 `PATH_TO_SETTING_YAML` は Qiita Teamの時と同じ手順で作成したDocBaseとNotePMのユーザIDを突合するファイルです。
 
-## 注意点
-
-- Qiita Teamの場合、実行時にWebブラウザ（Google Chrome）が開きます。あらかじめインストールが必要です。
-
 ## フォルダを指定して取り込む場合
 
 任意のフォルダ以下にあるファイルを取り込めます。インポート対象のディレクトリを `/path/to/import_dir/` で指定してください。
@@ -154,6 +150,28 @@ $ notepm word \
 `ACCESS_TOKEN` はNotePMで発行したアクセストークンになります。
 
 `NOTE_PM_SUBDOMAIN` はNotePMで利用しているサブドメインになります。たとえば `notepm` です。
+
+## Confluenceの場合
+
+ConfluenceでエクスポートしたZipファイルを解凍（展開）してください。そのパスを `/path/to/exported_dir/` として指定します。
+
+```
+$ notepm confluence \
+  -p /path/to/exported_dir/ \
+  -a ACCESS_TOKEN \
+  -t NOTE_PM_SUBDOMAIN \
+  -u PATH_TO_SETTING_YAML
+```
+
+`ACCESS_TOKEN` はNotePMで発行したアクセストークンになります。
+
+`NOTE_PM_SUBDOMAIN` はNotePMで利用しているサブドメインになります。たとえば `notepm` です。
+
+`PATH_TO_SETTING_YAML` は Qiita Teamの時と同じ手順で作成したConfluenceとNotePMのユーザIDを突合するファイルです。
+
+## 注意点
+
+- Qiita Teamの場合、実行時にWebブラウザ（Google Chrome）が開きます。あらかじめインストールが必要です。
 
 
 ## npm
