@@ -11,6 +11,7 @@ program
     .command('file [options]', 'Import from directory')
     .command('word [options]', 'Import from word files')
     .command('csv [options]', 'Import from CSV file')
+    .command('confluence [options]', 'Import from Confluence')
     .command('clean [options]', 'Clean data')
     .command('users', 'Output users data');
 program.parse();

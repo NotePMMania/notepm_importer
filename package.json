@@ -1,6 +1,6 @@
 {
   "name": "notepm_importer",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -13,7 +13,8 @@
     "notepm-docbase": "dist/docbase.js",
     "notepm-file": "dist/file.js",
     "notepm-word": "dist/word.js",
-    "notepm-csv": "dist/csv.js"
+    "notepm-csv": "dist/csv.js",
+    "notepm-confluence": "dist/confluence.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -26,9 +27,13 @@
     "@types/js-yaml": "^4.0.0",
     "commander": "^7.1.0",
     "dayjs": "^1.10.4",
+    "domhandler": "^4.0.0",
+    "fast-xml-parser": "^3.18.0",
     "form-data": "^4.0.0",
+    "htmlparser2": "^6.0.0",
     "iconv-lite": "^0.6.2",
     "js-yaml": "^4.0.0",
+    "jsdom": "^16.4.0",
     "locate-chrome": "^0.1.1",
     "mammoth": "^1.4.16",
     "markdown-it": "^12.0.4",

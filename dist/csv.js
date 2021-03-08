@@ -41,7 +41,7 @@ const options = commander_1.program.opts();
     const n = new note_pm_1.default(options.accessToken, options.team);
     const note = new note_pm_1.Note({
         name: 'インポート',
-        description: 'フォルダからインポートしたノート',
+        description: 'CSVからインポートしたノート',
         scope: 'private',
     });
     await note.save();
