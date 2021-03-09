@@ -32,7 +32,7 @@ const importExecute = async (note: Note, folder: Folder, dir: string) => {
         name: filePath.normalize('NFC'),
         parent_folder_id: folder ? folder.folder_id : null,
       });
-      f.save(note);
+      await f.save(note);
       if (folder)
       console.log(`  フォルダ ${folder.name} の下にフォルダ ${f.name} を作成しました`);
       await importExecute(note, f, dirPath);
@@ -48,7 +48,7 @@ const importExecute = async (note: Note, folder: Folder, dir: string) => {
       });
       await page.save();
       if (folder) {
-        console.log(`  フォルダ ${folder.name} の下にページ ${page.title} を作成しました`);
+        console.log(`  フォルダ ${folder.name} の下にページ ${page.title} を作成しました ${folder.folder_id}`);
       } else {
         console.log(`  ノート ${note.name} の下にページ ${page.title} を作成しました`);
       }
