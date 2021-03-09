@@ -124,16 +124,17 @@ const generatePage = async (dir, config, note, ary, folder) => {
     }
 };
 const uploadAttachment = async (dir, page, body) => {
-    const match = body.match(/!\[\]\((.*?)\)/mg);
+    const match = body.match(/!\[.*?\]\((.*?)\)/mg);
     page.body = body;
     if (!match) {
         console.log(`  画像はありません`);
         await page.save();
         return;
     }
+    console.log(match);
     console.log(`  画像をアップロードします`);
     for (const source of match) {
-        const src = source.replace('![](', '').replace(/\)$/, '').replace(/\?.*$/, '');
+        const src = source.replace(/!\[.*?\]\(/, '').replace(/\)$/, '').replace(/\?.*$/, '');
         const localFileName = path_1.default.basename(src);
         console.log(`    ファイル名 ${localFileName}`);
         const localPath = `${dir}${src}`;
