@@ -51,18 +51,20 @@ const options = program.opts();
     await page.save();
 
     const match = word.value.match(/!\[\]\((.*?)\)/mg);
-    for (const source of match) {
-      const src = source.replace('![](', '').replace(/\)$/, '');
-      const type = src.split(',')[0].replace(/data:(.*);.*/, "$1");
-      const ext = type.split('/')[1];
-      const data = src.split(',')[1];
-      const localFileName = `${(new Date).getTime()}.${ext}`;
-      const localPath = `${dir}images/${localFileName}`;
-      await promisify(fs.writeFile)(localPath, data, 'base64');
-      const attachment = await Attachment.add(page, localFileName, localPath);
-      const url = attachment.download_url.replace(/https:\/\/(.*?)\.notepm\.jp\/api\/v1\/attachments\/download\//, "https://$1.notepm.jp/private/");
-      word.value = word.value.replace(src, url);
-      await promisify(fs.unlink)(localPath);
+    if (match) {
+      for (const source of match) {
+        const src = source.replace('![](', '').replace(/\)$/, '');
+        const type = src.split(',')[0].replace(/data:(.*);.*/, "$1");
+        const ext = type.split('/')[1];
+        const data = src.split(',')[1];
+        const localFileName = `${(new Date).getTime()}.${ext}`;
+        const localPath = `${dir}images/${localFileName}`;
+        await promisify(fs.writeFile)(localPath, data, 'base64');
+        const attachment = await Attachment.add(page, localFileName, localPath);
+        const url = attachment.download_url.replace(/https:\/\/(.*?)\.notepm\.jp\/api\/v1\/attachments\/download\//, "https://$1.notepm.jp/private/");
+        word.value = word.value.replace(src, url);
+        await promisify(fs.unlink)(localPath);
+      }
     }
     page.body = word.value;
     await page.save();
