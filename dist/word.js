@@ -46,6 +46,7 @@ const options = commander_1.program.opts();
     catch (e) {
         await util_1.promisify(fs_1.default.mkdir)(`${dir}images`);
     }
+    console.log('ノート「インポート」を作成します');
     const note = new note_pm_1.Note({
         name: 'インポート',
         description: 'フォルダからインポートしたノート',
@@ -62,6 +63,7 @@ const options = commander_1.program.opts();
             continue;
         const word = await mammoth_1.default.convertToMarkdown({ path: dirPath });
         const basename = path_1.default.basename(filePath).normalize('NFC');
+        console.log(`Wordファイル ${basename} を処理します`);
         const title = basename.match(/.*\..*$/) ? basename.replace(/(.*)\..*$/, "$1") : basename;
         const page = new note_pm_1.Page({
             note_code: note.note_code,
@@ -70,14 +72,17 @@ const options = commander_1.program.opts();
             memo: ''
         });
         await page.save();
+        console.log(`ページ ${title} を作成しました`);
         const match = word.value.match(/!\[\]\((.*?)\)/mg);
         if (match) {
+            console.log(`  画像を処理します`);
             for (const source of match) {
                 const src = source.replace('![](', '').replace(/\)$/, '');
                 const type = src.split(',')[0].replace(/data:(.*);.*/, "$1");
                 const ext = type.split('/')[1];
                 const data = src.split(',')[1];
                 const localFileName = `${(new Date).getTime()}.${ext}`;
+                console.log(`  画像 ${localFileName} をアップロードします`);
                 const localPath = `${dir}images/${localFileName}`;
                 await util_1.promisify(fs_1.default.writeFile)(localPath, data, 'base64');
                 const attachment = await note_pm_1.Attachment.add(page, localFileName, localPath);
@@ -86,6 +91,7 @@ const options = commander_1.program.opts();
                 await util_1.promisify(fs_1.default.unlink)(localPath);
             }
         }
+        console.log(`  ページ本文を更新します`);
         page.body = word.value;
         await page.save();
     }
