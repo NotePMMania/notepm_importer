@@ -1,6 +1,6 @@
 {
   "name": "notepm_importer",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -41,7 +41,8 @@
     "papaparse": "^5.3.0",
     "parse-md": "^2.0.4",
     "puppeteer-core": "^7.1.0",
-    "turndown": "^7.0.0"
+    "turndown": "^7.0.0",
+    "turndown-plugin-gfm": "^1.0.2"
   },
   "devDependencies": {
     "@types/node": "^12.20.1",

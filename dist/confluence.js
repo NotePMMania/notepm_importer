@@ -31,7 +31,10 @@ const note_pm_1 = __importStar(require("./note_pm/"));
 const util_1 = require("util");
 const jsdom_1 = require("jsdom");
 const turndown_1 = __importDefault(require("turndown"));
+const turndownPluginGfm = __importStar(require("turndown-plugin-gfm"));
+const tables = turndownPluginGfm.tables;
 const turndown = new turndown_1.default();
+turndown.use(tables);
 const dir = process.argv[process.argv.length - 1];
 commander_1.program
     .version('0.0.1')

@@ -7,7 +7,10 @@ import NotePM, {Note, Folder, Page, Tag, Comment, Attachment, User} from './note
 import { promisify } from 'util';
 import { JSDOM } from 'jsdom';
 import TurndownService from 'turndown';
+import * as turndownPluginGfm from 'turndown-plugin-gfm';
+const tables = turndownPluginGfm.tables
 const turndown = new TurndownService();
+turndown.use(tables);
 
 const dir = process.argv[process.argv.length - 1];
 program
