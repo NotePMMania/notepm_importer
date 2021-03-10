@@ -73,11 +73,11 @@ const options = commander_1.program.opts();
         });
         await page.save();
         console.log(`ページ ${title} を作成しました`);
-        const match = word.value.match(/!\[\]\((.*?)\)/mg);
+        const match = word.value.match(/!\[.*?\]\((.*?)\)/sg);
         if (match) {
             console.log(`  画像を処理します`);
             for (const source of match) {
-                const src = source.replace('![](', '').replace(/\)$/, '');
+                const src = source.replace(/!\[.*?\]\(/, '').replace(/\)$/, '');
                 const type = src.split(',')[0].replace(/data:(.*);.*/, "$1");
                 const ext = type.split('/')[1];
                 const data = src.split(',')[1];
