@@ -56,7 +56,7 @@ const options = program.opts();
     if (match) {
       console.log(`  画像を処理します`);
       for (const source of match) {
-        const match = word.value.match(/!\[.*?\]\((.*?)\)/sg);
+        const src = source.replace(/!\[.*?\]\(/, '').replace(/\)$/, '');
         const type = src.split(',')[0].replace(/data:(.*);.*/, "$1");
         const ext = type.split('/')[1];
         const data = src.split(',')[1];
