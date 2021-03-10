@@ -52,11 +52,11 @@ const options = program.opts();
     });
     await page.save();
     console.log(`ページ ${title} を作成しました`);
-    const match = word.value.match(/!\[\]\((.*?)\)/mg);
+    const match = word.value.match(/!\[.*?\]\((.*?)\)/sg);
     if (match) {
       console.log(`  画像を処理します`);
       for (const source of match) {
-        const src = source.replace('![](', '').replace(/\)$/, '');
+        const match = word.value.match(/!\[.*?\]\((.*?)\)/sg);
         const type = src.split(',')[0].replace(/data:(.*);.*/, "$1");
         const ext = type.split('/')[1];
         const data = src.split(',')[1];
