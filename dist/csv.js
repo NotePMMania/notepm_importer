@@ -39,6 +39,8 @@ commander_1.program
 const options = commander_1.program.opts();
 (async (options) => {
     const n = new note_pm_1.default(options.accessToken, options.team);
+    await n.getUsers();
+    console.log('ノート「インポート」を作成します');
     const note = new note_pm_1.Note({
         name: 'インポート',
         description: 'CSVからインポートしたノート',
@@ -56,6 +58,7 @@ const options = commander_1.program.opts();
     const csv = iconv_lite_1.default.decode(buf, 'Shift_JIS');
     const ary = papaparse_1.default.parse(csv, { header: true });
     for (const params of ary.data) {
+        console.log(`ページ「${params.title}」を作成します`);
         const page = new note_pm_1.Page({
             note_code: note.note_code,
             title: params.title,

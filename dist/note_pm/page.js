@@ -32,6 +32,7 @@ class Page {
         this.memo = params.memo;
         this.created_at = params.created_at;
         this.updated_at = params.updated_at;
+        this.user = params.user;
         if (params.created_by) {
             this.created_by = new user_1.default(params.created_by);
         }

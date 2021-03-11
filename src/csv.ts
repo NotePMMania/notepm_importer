@@ -20,6 +20,8 @@ const options = program.opts();
 
 (async (options) => {
   const n = new NotePM(options.accessToken, options.team);
+  await n.getUsers();
+  console.log('ノート「インポート」を作成します')
   const note = new Note({
     name: 'インポート',
     description: 'CSVからインポートしたノート',
@@ -37,6 +39,7 @@ const options = program.opts();
   const csv = iconv.decode(buf, 'Shift_JIS');
   const ary = Papa.parse(csv, {header: true});
   for (const params of ary.data) {
+    console.log(`ページ「${params.title}」を作成します`);
     const page = new Page({
       note_code: note.note_code,
       title: params.title,
