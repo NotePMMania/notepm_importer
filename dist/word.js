@@ -57,14 +57,14 @@ const options = commander_1.program.opts();
     for (const filePath of ary) {
         if (filePath.match(/^\./))
             continue;
-        if (filePath.match(/\.docx$/)) {
-            console.log(`docx以外のファイル形式には対応していません。スキップします ${filePath}`);
-            continue;
-        }
         const dirPath = `${dir}${filePath}`;
         const file = await util_1.promisify(fs_1.default.stat)(dirPath);
         if (file.isDirectory())
             continue;
+        if (!filePath.match(/\.docx$/)) {
+            console.log(`docx以外のファイル形式には対応していません。スキップします ${filePath}`);
+            continue;
+        }
         const word = await mammoth_1.default.convertToMarkdown({ path: dirPath });
         const basename = path_1.default.basename(filePath).normalize('NFC');
         console.log(`Wordファイル ${basename} を処理します`);
