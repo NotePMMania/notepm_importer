@@ -37,6 +37,10 @@ const options = program.opts();
   const ary = await promisify(fs.readdir)(dir);
   for (const filePath of ary) {
     if (filePath.match(/^\./)) continue;
+    if (filePath.match(/\.docx$/)) {
+      console.log(`docx以外のファイル形式には対応していません。スキップします ${filePath}`);
+      continue;
+    }
     const dirPath = `${dir}${filePath}`;
     const file = await promisify(fs.stat)(dirPath);
     if (file.isDirectory()) continue;
