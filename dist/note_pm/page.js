@@ -70,7 +70,7 @@ class Page {
             body: this.body,
             memo: this.memo,
             user: user || 'NotePM-bot',
-            created_at: dayjs_1.default(this.created_at).format('YYYY-MM-DD HH:mm:ss'),
+            created_at: dayjs_1.default(this.created_at).format('YYYY-MM-DDTHH:mm:ssZ'),
             tags: this.tags,
         });
         if (response.messages)
