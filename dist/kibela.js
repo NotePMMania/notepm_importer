@@ -127,6 +127,8 @@ const findOrCreateFolder = async (note, folders, paths, parentFolder = null) => 
                 for (const c of file.metadata.comments) {
                     const comment = new note_pm_1.Comment({
                         page_code: page.page_code,
+                        created_at: c.published_at,
+                        user: c.author,
                         body: c.content
                     });
                     await comment.save();

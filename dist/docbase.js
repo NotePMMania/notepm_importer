@@ -114,7 +114,9 @@ const options = commander_1.program.opts();
                 for (const c of file.comments) {
                     const comment = new note_pm_1.Comment({
                         page_code: page.page_code,
-                        body: c.body
+                        body: c.body,
+                        user: c.user.name,
+                        created_at: c.created_at
                     });
                     await comment.save();
                     await comment.updateImageBody(null, page, `${d.dir}/attachments/`);

@@ -83,6 +83,7 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
 }
 
 (async (options) => {
+  if (!options.domain || !options.domain.match(/.*\.qiita\.com/) ) throw new Error('Qiitaのドメインが指定されていない、または qiita.com で終わっていません');
   const str = await promisify(fs.readFile)(options.userYaml, 'utf-8');
   const config = await yaml.load(str) as Config;
   const q = new QiitaTeam(options.domain, options.path);
@@ -152,7 +153,7 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
       a.tags.forEach(t => page.tags?.push(t.name));
     }
     if (a.user) {
-      page.user = n.findUser(a.user.id);
+      page.user = a.user.id;
     }
     console.log(`    ノートを保存します`);
     await page.save();
@@ -170,10 +171,12 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
         console.log(`データがありません ${page.title} : ${a.title}`);
         return;
       }
-      console.log(`  コメントがあります（ページコード： ${page.page_code}） ${page.title}`);
-      a.comments!.forEach(async c => {
+      console.log(`  コメントが${a.comments?.length}件あります（ページコード： ${page.page_code}） ${page.title}`);
+      for (const c of a.comments!) {
         const comment = new Comment({
           page_code: page.page_code!,
+          created_at: c.created_at,
+          user: c.user?.id,
           body: c.body
         });
         console.log(`  コメントを保存します`);

@@ -2,11 +2,14 @@ import NotePM from './index';
 import Attachment from './attachment';
 import Page from './page';
 import QiitaTeam from '../qiita/index';
+import dayjs from 'dayjs';
 
 class Comment {
   static NotePM: NotePM;
   public page_code = '';
   public body = '';
+  public user = '';
+  public created_at = '';
   public comment_number: number | null = null;
 
   constructor(params: notePM_Comment) {
@@ -16,6 +19,8 @@ class Comment {
   setParams(params: notePM_Comment) {
     this.page_code = params.page_code;
     this.body = params.body;
+    this.user = params.user as string;
+    this.created_at = params.created_at as string;
     if (params.comment_number) {
       this.comment_number = params.comment_number;
     }
@@ -36,8 +41,11 @@ class Comment {
   }
 
   async create(): Promise<Comment> {
+    const user = Comment.NotePM.findUser(this.user);
     const response = await Comment.NotePM.fetch('POST', `/pages/${this.page_code}/comments`, {
-      body: this.body
+      body: this.body,
+      created_at: dayjs(this.created_at).format('YYYY-MM-DDTHH:mm:ssZ'),
+      user
     });
     const params = response.comment as notePM_Comment;
     this.setParams(params);

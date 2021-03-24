@@ -5,16 +5,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const attachment_1 = __importDefault(require("./attachment"));
 const page_1 = __importDefault(require("./page"));
+const dayjs_1 = __importDefault(require("dayjs"));
 class Comment {
     constructor(params) {
         this.page_code = '';
         this.body = '';
+        this.user = '';
+        this.created_at = '';
         this.comment_number = null;
         this.setParams(params);
     }
     setParams(params) {
         this.page_code = params.page_code;
         this.body = params.body;
+        this.user = params.user;
+        this.created_at = params.created_at;
         if (params.comment_number) {
             this.comment_number = params.comment_number;
         }
@@ -33,8 +38,11 @@ class Comment {
         }
     }
     async create() {
+        const user = Comment.NotePM.findUser(this.user);
         const response = await Comment.NotePM.fetch('POST', `/pages/${this.page_code}/comments`, {
-            body: this.body
+            body: this.body,
+            created_at: dayjs_1.default(this.created_at).format('YYYY-MM-DDTHH:mm:ssZ'),
+            user
         });
         const params = response.comment;
         this.setParams(params);

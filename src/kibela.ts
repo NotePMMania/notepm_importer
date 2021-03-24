@@ -114,6 +114,8 @@ const findOrCreateFolder = async (note: Note, folders: Kibela_Folder[], paths: s
         for (const c of file.metadata.comments) {
           const comment = new Comment({
             page_code: page.page_code!,
+            created_at: c.published_at,
+            user: c.author,
             body: c.content
           });
           await comment.save();

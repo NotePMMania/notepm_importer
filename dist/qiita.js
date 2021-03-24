@@ -96,7 +96,9 @@ const prepareTag = async (n, q) => {
     tags.forEach(t => n.tags.push(t));
 };
 (async (options) => {
-    var _a;
+    var _a, _b, _c;
+    if (!options.domain || !options.domain.match(/.*\.qiita\.com/))
+        throw new Error('Qiitaのドメインが指定されていない、または qiita.com で終わっていません');
     const str = await util_1.promisify(fs_1.default.readFile)(options.userYaml, 'utf-8');
     const config = await js_yaml_1.default.load(str);
     const q = new qiita_1.default(options.domain, options.path);
@@ -167,7 +169,7 @@ const prepareTag = async (n, q) => {
             a.tags.forEach(t => { var _a; return (_a = page.tags) === null || _a === void 0 ? void 0 : _a.push(t.name); });
         }
         if (a.user) {
-            page.user = n.findUser(a.user.id);
+            page.user = a.user.id;
         }
         console.log(`    ノートを保存します`);
         await page.save();
@@ -184,10 +186,12 @@ const prepareTag = async (n, q) => {
                 console.log(`データがありません ${page.title} : ${a.title}`);
                 return;
             }
-            console.log(`  コメントがあります（ページコード： ${page.page_code}） ${page.title}`);
-            a.comments.forEach(async (c) => {
+            console.log(`  コメントが${(_b = a.comments) === null || _b === void 0 ? void 0 : _b.length}件あります（ページコード： ${page.page_code}） ${page.title}`);
+            for (const c of a.comments) {
                 const comment = new note_pm_1.Comment({
                     page_code: page.page_code,
+                    created_at: c.created_at,
+                    user: (_c = c.user) === null || _c === void 0 ? void 0 : _c.id,
                     body: c.body
                 });
                 console.log(`  コメントを保存します`);
@@ -196,7 +200,8 @@ const prepareTag = async (n, q) => {
                     console.log(`  コメントに画像があります。内容を更新します`);
                     await comment.updateImageBody(q, page);
                 }
-            });
+            }
+            ;
         }
     }
     console.log('インポート終了しました');

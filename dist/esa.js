@@ -64,7 +64,14 @@ const prepareFolder = async (note, dirs, parentFolder) => {
         if (parentFolder) {
             folder.parent_folder_id = parentFolder.folder_id;
         }
-        await folder.save(note);
+        try {
+            await folder.save(note);
+        }
+        catch (e) {
+            console.error(`フォルダの作成に失敗しました： ${folder.name}`);
+            console.error(`エラーメッセージ${e.message}`);
+            process.exit(1);
+        }
         res.folder = folder;
         if (dir.dirs) {
             const folders = await prepareFolder(note, dir.dirs, folder);
@@ -93,18 +100,9 @@ const findNoteOrFolder = (dirs, category) => {
 };
 (async (options) => {
     const n = new note_pm_1.default(options.accessToken, options.team);
-    const e = new index_1.default(options.domain, options.path);
+    const e = new index_1.default(options.path);
     await e.loadFiles();
     const dirs = await e.dirs();
-    // ブラウザを立ち上げて画像をダウンロード
-    /*
-    console.log('ブラウザを立ち上げます。esa.ioへログインしてください');
-    await e.open();
-    await e.downloadImage();
-    // await q.downloadAttachment();
-    e.close();
-    console.log('画像をダウンロードしました');
-    */
     await n.getTags();
     // タグの用意
     let tags = [];
