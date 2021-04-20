@@ -185,7 +185,7 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
           console.log(`  コメントに画像があります。内容を更新します`);
           await comment.updateImageBody(q, page);
         }
-      });
+      };
     }
   }
   console.log('インポート終了しました');

@@ -53,7 +53,9 @@ class Comment {
             body: this.body
         });
         const params = response.comment;
-        this.setParams(params);
+        if (params) {
+            this.setParams(params);
+        }
         return this;
     }
     async updateImageBody(q, page, dir = '') {

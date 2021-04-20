@@ -45,6 +45,8 @@ const options = commander_1.program.opts();
         throw new Error('チームドメインは必須です（-t TEAM_DOMAIN）');
     if (!options.path)
         throw new Error('DocbaseのZipを展開したディレクトリは必須です（-p PATH_TO_DIR）');
+    if (!options.userYaml)
+        throw new Error('ユーザ設定ファイルが必要です（-u PATH_TO_YAML）');
     const n = new note_pm_1.default(options.accessToken, options.team);
     const d = new index_1.default(options.path);
     await d.loadFiles();
@@ -109,6 +111,7 @@ const options = commander_1.program.opts();
             page.user = file.user.name;
             await page.save();
             await page.updateImageBody(null, `${d.dir}/attachments/`);
+            console.log(`    ページID： ${page.page_code}`);
             // コメント投稿
             if (file.comments) {
                 for (const c of file.comments) {

@@ -124,18 +124,23 @@ class Page {
     const urls: notePM_UploadImage[] = [];
     for (const url of images) {
       console.log(`    ${this.title}に画像をアップロードします。 ${dir}${url}`);
-      const filePath = q ? q.filePath(url) : `${dir}${url}`;
-      const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
-      const attachment = await Attachment.add(this, fileName, filePath);
-      urls.push({
-        url,
-        download_url: `https://${Page.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
-      });
+      try {
+        const filePath = q ? q.filePath(url) : `${dir}${url}`;
+        const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
+        const attachment = await Attachment.add(this, fileName, filePath);
+        urls.push({
+          url,
+          download_url: `https://${Page.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
+        });
+      } catch (e) {
+        console.log(`      ${dir}${url}のアップロードに失敗しました（ファイルがない、またはファイル名が不正など）`);
+      }
     }
     urls.forEach(params => {
       const r = new RegExp(params.url, 'gs');
       this.body = this.body.replace(r, params.download_url);
     });
+    console.log(`    ${this.title}を更新します`);
     await this.save();
   }
 }

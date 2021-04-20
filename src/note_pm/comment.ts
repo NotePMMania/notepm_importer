@@ -57,7 +57,9 @@ class Comment {
       body: this.body
     });
     const params = response.comment as notePM_Comment;
-    this.setParams(params);
+    if (params) {
+      this.setParams(params);
+    }
     return this;
   }
 
