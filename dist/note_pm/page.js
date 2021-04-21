@@ -113,9 +113,9 @@ class Page {
         const urls = [];
         for (const url of images) {
             console.log(`    ${this.title}に画像をアップロードします。 ${dir}${url}`);
+            const filePath = q ? q.filePath(url) : `${dir}${url}`;
+            const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
             try {
-                const filePath = q ? q.filePath(url) : `${dir}${url}`;
-                const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
                 const attachment = await attachment_1.default.add(this, fileName, filePath);
                 urls.push({
                     url,
@@ -123,7 +123,7 @@ class Page {
                 });
             }
             catch (e) {
-                console.log(`      ${dir}${url}のアップロードに失敗しました（ファイルがない、またはファイル名が不正など）`);
+                console.log(`      ${fileName}のアップロードをスキップしました`);
             }
         }
         urls.forEach(params => {

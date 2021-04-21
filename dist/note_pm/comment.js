@@ -64,11 +64,16 @@ class Comment {
         for (const url of images) {
             const filePath = q ? q.filePath(url) : `${dir}${url}`;
             const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
-            const attachment = await attachment_1.default.add(page, fileName, filePath);
-            urls.push({
-                url,
-                download_url: `https://${page_1.default.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
-            });
+            try {
+                const attachment = await attachment_1.default.add(page, fileName, filePath);
+                urls.push({
+                    url,
+                    download_url: `https://${page_1.default.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
+                });
+            }
+            catch (e) {
+                console.log(`      ${fileName}のアップロードをスキップしました`);
+            }
         }
         urls.forEach(params => {
             const r = new RegExp(params.url, 'gs');
