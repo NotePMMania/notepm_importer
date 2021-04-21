@@ -112,9 +112,9 @@ class Page {
         const images = this.images();
         const urls = [];
         for (const url of images) {
-            console.log(`    ${this.title}に画像をアップロードします。 ${dir}${url}`);
             const filePath = q ? q.filePath(url) : `${dir}${url}`;
             const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
+            console.log(`    ${this.title}に画像をアップロードします。 ${fileName}`);
             try {
                 const attachment = await attachment_1.default.add(this, fileName, filePath);
                 urls.push({
@@ -123,7 +123,7 @@ class Page {
                 });
             }
             catch (e) {
-                console.log(`      ${fileName}のアップロードをスキップしました`);
+                console.log(`      アップロードをスキップしました。 ${fileName}`);
             }
         }
         urls.forEach(params => {

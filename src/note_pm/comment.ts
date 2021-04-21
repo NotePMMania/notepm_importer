@@ -66,6 +66,7 @@ class Comment {
   async updateImageBody(q: QiitaTeam | null, page: Page, dir = ''): Promise<void> {
     const images = this.images();
     const urls: notePM_UploadImage[] = [];
+    console.log(`      コメントに画像をアップロードします`);
     for (const url of images) {
       const filePath = q ? q.filePath(url) : `${dir}${url}`;
       const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");

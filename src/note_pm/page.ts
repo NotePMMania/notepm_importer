@@ -123,9 +123,9 @@ class Page {
     const images = this.images();
     const urls: notePM_UploadImage[] = [];
     for (const url of images) {
-      console.log(`    ${this.title}に画像をアップロードします。 ${dir}${url}`);
       const filePath = q ? q.filePath(url) : `${dir}${url}`;
       const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
+      console.log(`    ${this.title}に画像をアップロードします。 ${fileName}`);
       try {
         const attachment = await Attachment.add(this, fileName, filePath);
         urls.push({
@@ -133,7 +133,7 @@ class Page {
           download_url: `https://${Page.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
         });
       } catch (e) {
-        console.log(`      ${fileName}のアップロードをスキップしました`);
+        console.log(`      アップロードをスキップしました。 ${fileName}`);
       }
     }
     urls.forEach(params => {

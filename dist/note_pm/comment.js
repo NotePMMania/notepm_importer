@@ -61,6 +61,7 @@ class Comment {
     async updateImageBody(q, page, dir = '') {
         const images = this.images();
         const urls = [];
+        console.log(`      コメントに画像をアップロードします`);
         for (const url of images) {
             const filePath = q ? q.filePath(url) : `${dir}${url}`;
             const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
