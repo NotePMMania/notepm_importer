@@ -3,7 +3,7 @@ import Page from './page';
 import Tag from './tag';
 import Note from './note';
 import FormData from 'form-data';
-import fetch from 'node-fetch';
+import fetch from 'node-fetch-with-proxy';
 import User from './user';
 import Attachment from './attachment';
 import Comment from './comment';

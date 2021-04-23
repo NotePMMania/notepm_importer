@@ -13,7 +13,7 @@ exports.Tag = tag_1.default;
 const note_1 = __importDefault(require("./note"));
 exports.Note = note_1.default;
 const form_data_1 = __importDefault(require("form-data"));
-const node_fetch_1 = __importDefault(require("node-fetch"));
+const node_fetch_with_proxy_1 = __importDefault(require("node-fetch-with-proxy"));
 const user_1 = __importDefault(require("./user"));
 exports.User = user_1.default;
 const attachment_1 = __importDefault(require("./attachment"));
@@ -58,25 +58,25 @@ class NotePM {
         }
         await sleep(1000);
         if (method === 'GET') {
-            const res = await node_fetch_1.default(`${this.url}${path}`, { headers });
+            const res = await node_fetch_with_proxy_1.default(`${this.url}${path}`, { headers });
             return await res.json();
         }
         if (method === 'POST') {
             if (!(body instanceof form_data_1.default)) {
                 body = JSON.stringify(body);
             }
-            const res = await node_fetch_1.default(`${this.url}${path}`, { method, headers, body });
+            const res = await node_fetch_with_proxy_1.default(`${this.url}${path}`, { method, headers, body });
             return await res.json();
         }
         if (method === 'PATCH') {
             if (!(body instanceof form_data_1.default)) {
                 body = JSON.stringify(body);
             }
-            const res = await node_fetch_1.default(`${this.url}${path}`, { method, headers, body });
+            const res = await node_fetch_with_proxy_1.default(`${this.url}${path}`, { method, headers, body });
             return await res.json();
         }
         if (method === 'DELETE') {
-            const res = await node_fetch_1.default(`${this.url}${path}`, { method, headers });
+            const res = await node_fetch_with_proxy_1.default(`${this.url}${path}`, { method, headers });
             const text = await res.text();
             if (text === '')
                 return {};
