@@ -27,7 +27,7 @@ class Folder {
   async findOrCreate(note: notePM_Note, name: string, parentFolder?: Folder) {
     const folder = await this.find(note, name);
     if (folder) return folder;
-    return this.create(note, name, parentFolder);
+    return this.create(note);
   }
   
   async find(note: notePM_Note, name: string): Promise<Folder | undefined> {
@@ -38,12 +38,12 @@ class Folder {
     return params ? new Folder(params) : undefined;
   }
 
-  async create(note: Note): Promise<notePM_Folder> {
+  async create(note: notePM_Note | Note): Promise<notePM_Folder> {
     const response = await Folder.NotePM.fetch('POST', `/notes/${note.note_code}/folders`, {
       name: this.name,
       parent_folder_id: this.parent_folder_id
     });
-    if (response.messages) throw new Error(`Error: ${response.messages.join(', ')} page_code ${this.page_code}`);
+    if (response.messages) throw new Error(`Error: ${response.messages.join(', ')} エラーになったフォルダ名「${this.name}」`);
     return response.folder;
   }
 }

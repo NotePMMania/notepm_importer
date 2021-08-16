@@ -25,7 +25,7 @@ class Folder {
         const folder = await this.find(note, name);
         if (folder)
             return folder;
-        return this.create(note, name, parentFolder);
+        return this.create(note);
     }
     async find(note, name) {
         const response1 = await Folder.NotePM.fetch('GET', `/notes/${note.note_code}/folders`);
@@ -38,7 +38,7 @@ class Folder {
             parent_folder_id: this.parent_folder_id
         });
         if (response.messages)
-            throw new Error(`Error: ${response.messages.join(', ')} page_code ${this.page_code}`);
+            throw new Error(`Error: ${response.messages.join(', ')} エラーになったフォルダ名「${this.name}」`);
         return response.folder;
     }
 }

@@ -32,16 +32,23 @@ const importExecute = async (note: Note, folder: Folder, dir: string) => {
         name: filePath.normalize('NFC'),
         parent_folder_id: folder ? folder.folder_id : null,
       });
-      await f.save(note);
-      if (folder)
-      console.log(`  フォルダ ${folder.name} の下にフォルダ ${f.name} を作成しました`);
-      await importExecute(note, f, dirPath);
+      try {
+        await f.save(note);
+        if (folder) {
+          console.log(`  フォルダ ${folder.name} の下にフォルダ ${f.name} を作成しました`);
+        }
+        await importExecute(note, f, dirPath);
+      } catch (e) {
+        console.log(`  フォルダ ${folder.name} の下にフォルダ ${f.name} を作成しようとしてエラーが発生しました`);
+        console.log(`  ${e.message}`);
+        process.exit(1);
+      }
     } else {
       const basename = path.basename(filePath).normalize('NFC');
       const title = basename.match(/.*\..*$/) ? basename.replace(/(.*)\..*$/, "$1") : basename
       const page = new Page({
         note_code: note.note_code,
-        folder_id: folder ? folder.folder_id : null,
+        folder_id: folder ? folder.folder_id : undefined,
         title: title,
         body: filePath,
         memo: ''
