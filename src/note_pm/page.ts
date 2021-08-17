@@ -79,7 +79,7 @@ class Page {
       created_at: dayjs(this.created_at).format('YYYY-MM-DDTHH:mm:ssZ'),
       tags: this.tags,
     });
-    if (response.messages) throw new Error(`Error: ${response.messages.join(', ')} page_code ${this.page_code}`);
+    if (response.messages) throw new Error(`Error: ${response.messages.join(', ')} タイトル ${this.title} page_code ${this.page_code}`);
     return await response.page as notePM_Page;
   }
 

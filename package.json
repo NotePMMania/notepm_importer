@@ -1,6 +1,6 @@
 {
   "name": "notepm_importer",
-  "version": "1.0.20",
+  "version": "1.0.21",
   "description": "",
   "main": "index.js",
   "bin": {
@@ -14,6 +14,7 @@
     "notepm-file": "dist/file.js",
     "notepm-word": "dist/word.js",
     "notepm-csv": "dist/csv.js",
+    "notepm-googlesite": "dist/google-site.js",
     "notepm-confluence": "dist/confluence.js"
   },
   "scripts": {

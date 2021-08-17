@@ -74,7 +74,7 @@ class Page {
             tags: this.tags,
         });
         if (response.messages)
-            throw new Error(`Error: ${response.messages.join(', ')} page_code ${this.page_code}`);
+            throw new Error(`Error: ${response.messages.join(', ')} タイトル ${this.title} page_code ${this.page_code}`);
         return await response.page;
     }
     async update() {

@@ -23,32 +23,64 @@ program
 
 const options = program.opts();
 
-const generateTree = async (dir: string) => {
-  const files = await promisify(fs.readdir)(dir);
-  const uls = li.querySelectorAll(`:scope > ul`);
-  if (!uls) return null;
+const generateTree = async (baseDir: string, dir: string, base: string = '') => {
+  const files = await promisify(fs.readdir)(`${base}${dir}`);
+  if (!files) return null;
   const ary = [];
-  for (const ul of uls) {
-    if (ul.parentElement !== li) continue;
-    const { document } = (new JSDOM(ul.outerHTML)).window;
-    const lis = document.querySelectorAll('ul:first-child > li');
-    for (const li of lis) {
-      if (li.parentElement.outerHTML !== ul.outerHTML) continue;
+  for (const file of files) {
+    if (file.match(/^\./)) continue;
+    const filePath = `${base}${dir}${file}`;
+    const stat = await promisify(fs.lstat)(filePath);
+    if (stat.isDirectory()){
       const obj = {
-        name: li.querySelector('a').textContent,
-        url: li.querySelector('a').getAttribute('href'),
-        child: null
+        name: filePath.replace(`${base}${dir}`, ''),
+        url: filePath.replace(`${base}${dir}`, ''),
+        content: '',
+        child: null,
       };
-      if (obj.url) {
-        const content = await promisify(fs.readFile)(`${dir}${obj.url}`, 'utf-8');
-        const { document } = (new JSDOM(content)).window;
-        const main = document.querySelector('#main-content');
-        obj.author = document.querySelector('.author').textContent.trim();
-        obj.content = turndown.turndown(main.innerHTML);
+      const child = await generateTree(baseDir, `${file}/`, `${base}${dir}`);
+      if (child.length > 0) {
+        obj.child = child;
+        ary.push(obj);
       }
-      const { document } = (new JSDOM(li.outerHTML)).window;
-      if (document.querySelectorAll('ul')) {
-        obj.child = await generateTree(dir);
+    } else {
+      if (!file.match(/\.html$/)) continue;
+      const content = await promisify(fs.readFile)(filePath, 'utf-8');
+      const { document } = (new JSDOM(content)).window;
+      const obj = {
+        name: document.querySelector('#sites-page-title').textContent.trim(),
+        id: filePath.replace(`${base}${dir}`, '').replace(/\.html$/, ''),
+        url: filePath.replace(`${base}${dir}`, ''),
+        content: turndown.turndown(document.querySelector('#sites-canvas-main').innerHTML)
+      };
+      const attachments = document.querySelectorAll('.sites-attachments-name a');
+      obj.attachments = [];
+      for (const attachment of attachments) {
+        obj.attachments.push({
+          name: attachment.getAttribute('href').replace(/.*\//, ''),
+          path: attachment.getAttribute('href')
+        });
+      }
+      const comments = document.querySelectorAll('.comment');
+      obj.comments = [];
+      for (const comment of comments) {
+        const username = comment.querySelector('.user-name').textContent;
+        const body = comment.querySelector('.comment-content').textContent;
+        const date = new Date(comment.querySelector('.created-date').textContent);
+        obj.comments.push({
+          username, body, date
+        });
+        const replies = comment.querySelectorAll('.reply-box');
+        if (replies.length > 0) {
+          for (const reply of replies) {
+            const username = reply.querySelector('.user-name').textContent;
+            const body = reply.querySelector('.comment-content').textContent;
+            const date = new Date(reply.querySelector('.created-date').textContent);
+            obj.comments.push({
+              username, body, date
+            });
+          }
+        }
       }
       ary.push(obj);
     }
@@ -56,61 +88,100 @@ const generateTree = async (dir: string) => {
   return ary;
 }
 
+const getFolderName = (name: string, ary: any[]): string => {
+  return ary.filter(a => a.id === name)[0].name;
+}
+
 const generatePage = async (dir: string, config, note: Note, ary: any[], folder?: Folder) => {
   for (const params of ary) {
     let f;
-    if (params.child.length > 0) {
+    if (params.child) {
       // フォルダを作る
-      console.log(`フォルダを作成します ${params.name}`);
+      const folderName = getFolderName(params.name, ary);
+      console.log(`フォルダを作成します ${folderName}`);
       f = new Folder({
         parent_folder_id: folder ? folder.folder_id : null,
-        name: params.name,
+        name: folderName,
       });
       await f.save(note);
-    }
-    console.log(`ページを作成します ${params.name}`);
-    const page = new Page({
-      note_code: note.note_code,
-      title: params.name,
-      body: '',
-      memo: '',
-      folder_id: f ? f.folder_id : (folder ? folder.folder_id : undefined),
-    });
-    const u = config.users.filter(u => u.id === params.author)[0];
-    if (u) {
-      page.user = u.user_code;
-    }
-    console.log(`  作成者は ${page.user} とします`);
-    await page.save();
-    await uploadAttachment(dir, page, params.content);
-    if (params.child.length > 0) {
-      generatePage(dir, config, note, params.child, f);
+      generatePage(`${dir}${params.name}/`, config, note, params.child, f);
+    } else {
+      console.log(`ページを作成します ${params.name}`);
+      const page = new Page({
+        note_code: note.note_code,
+        title: params.name,
+        body: '',
+        memo: '',
+        folder_id: folder ? folder.folder_id : undefined,
+      });
+      await page.save();
+      await uploadAttachment(dir, page, params.content);
+
+      // 単純な添付ファイル
+      if (params.attachments.length > 0) {
+        console.log(`  添付ファイルを${params.name}にアップロードします`);
+        for (const attachment of params.attachments) {
+          const name = decodeURIComponent(attachment.path);
+          console.log(`    添付ファイル（${name}）をアップロードします`);
+          const localPath = `${dir}${name}`;
+          try {
+            await Attachment.add(page, name, localPath);
+            console.log(`    添付ファイル（${name}）をアップロードしました`);
+          } catch (e) {
+            console.log(`    添付ファイル（${name}）をアップロードできませんでした`);
+          }
+        }
+        console.log('  添付ファイルをアップロードしました');
+      }
+      if (params.comments.length > 0) {
+        console.log(`  ${params.name}にコメントを投稿します`);
+        for (const c of params.comments) {
+          const comment = new Comment({
+            page_code: page.page_code!,
+            body: c.body,
+            user: c.username,
+            created_at: c.date
+          });
+          try {
+            await comment.save();
+            console.log(`    コメントを投稿しました`);
+          } catch (e) {
+            console.log(`    コメントの投稿に失敗しました ${e.message}`);
+          }
+        }
+        console.log(`  ${params.name}にコメントを投稿しました`);
+      }
     }
   }
 }
 
 const uploadAttachment = async (dir: string, page: Page, body: string) => {
-  const match = body.match(/!\[.*?\]\((.*?)\)/mg);
+  const { document } = (new JSDOM(body)).window;
+  const dom = document.querySelectorAll('img');
+  const images = [];
+  for (const img of dom) {
+    const src = img.getAttribute('src');
+    if (!src.match(/^http/)) {
+      images.push(src);
+    }
+  }
+  
   page.body = body;
-  if (!match) {
-    console.log(`  画像はありません`);
-    await page.save();
-    return;
+  if (images.length > 0) {
+    console.log(`  画像をアップロードします`);
+    for (const source of images) {
+      console.log(`    ファイル名 ${source}`);
+      const localPath = `${dir}${source}`;
+      const attachment = await Attachment.add(page, source, localPath);
+      const url = attachment.download_url.replace(/https:\/\/(.*?)\.notepm\.jp\/api\/v1\/attachments\/download\//, "https://$1.notepm.jp/private/");
+      const r = new RegExp(source, 'g');
+      page.body = page.body.replace(r, url);
+    }
+    console.log(`  画像アップロード完了しました`);
   }
-  console.log(match);
-  console.log(`  画像をアップロードします`);
-  for (const source of match) {
-    const src = source.replace(/!\[.*?\]\(/, '').replace(/\)$/, '').replace(/\?.*$/, '');
-    const localFileName = path.basename(src);
-    console.log(`    ファイル名 ${localFileName}`);
-    const localPath = `${dir}${src}`;
-    const attachment = await Attachment.add(page, localFileName, localPath);
-    const url = attachment.download_url.replace(/https:\/\/(.*?)\.notepm\.jp\/api\/v1\/attachments\/download\//, "https://$1.notepm.jp/private/");
-    page.body = page.body.replace(src, url);
-  }
-  console.log(`  画像アップロード完了しました`);
   await page.save();
 }
+
 
 (async (options) => {
   const n = new NotePM(options.accessToken, options.team);
@@ -130,35 +201,21 @@ const uploadAttachment = async (dir: string, page: Page, body: string) => {
   }
 
   const indexPath = `${dir}home.html`;
-  // const indexContent = await promisify(fs.readFile)(indexPath, 'utf-8');
-  // const { document } = (new JSDOM(indexContent)).window;
-  // const list = document.querySelectorAll('.pageSection')[1];
-  const ary = await generateTree(dir);
+  const indexContent = await promisify(fs.readFile)(indexPath, 'utf-8');
+  const { document } = (new JSDOM(indexContent)).window;
+  const noteName = document.querySelector('#sites-chrome-userheader-title').textContent;
+  const ary = await generateTree(dir, dir);
   const note = new Note({
-    name: ary[0].name,
-    description: 'Confluenceからインポートしたノート',
+    name: noteName,
+    description: 'Google Siteからインポートしたノート',
     scope: 'private',
   });
   await note.save();
-  if (ary[0].content) {
-    const page = new Page({
-      note_code: note.note_code,
-      title: ary[0].name,
-      body: '',
-      memo: '',
-    });
-    const u = config.users.filter(u => u.id === ary[0].author)[0];
-    if (u) {
-      page.user = u.user_code;
-    }
-    await page.save();
-    uploadAttachment(dir, page, ary[0].content);
+  try {
+    await generatePage(dir, config, note, ary);
+  } catch (e) {
+    // エラー
+    console.log('エラーが出たのでノートを削除します')
+    await note.delete();
   }
-  await generatePage(dir, config, note, ary[0].child);
-
-  
-  // childがない場合はページとして作成
-  // childがある場合は、フォルダを作成
-  // フォルダの中に「概要」ページを作成して、内容を記述
-  // フォルダの中に子要素のページを作成
 })(options);
