@@ -38,6 +38,9 @@ class Attachment {
     formData.append('page_code', page.page_code!);
     const response = await Attachment.NotePM.fetch('POST', `/attachments`, formData);
     const params = response.attachments as notePM_Attachment;
+    if (!params.file_id) {
+      throw new Error(`添付ファイルの投稿に失敗しました。ファイル名 ${fileName} / ページ ${page.title}`)
+    }
     return new Attachment(params);
   }
 }
