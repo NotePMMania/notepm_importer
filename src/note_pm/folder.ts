@@ -39,6 +39,7 @@ class Folder {
   }
 
   async create(note: notePM_Note | Note): Promise<notePM_Folder> {
+    console.log(`フォルダを作成します : ${this.name}`);
     const response = await Folder.NotePM.fetch('POST', `/notes/${note.note_code}/folders`, {
       name: this.name,
       parent_folder_id: this.parent_folder_id

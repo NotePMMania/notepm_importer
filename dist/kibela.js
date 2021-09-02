@@ -67,6 +67,8 @@ const findOrCreateFolder = async (note, folders, paths, parentFolder = null) => 
         throw new Error('チームドメインは必須です（-t TEAM_DOMAIN）');
     if (!options.path)
         throw new Error('KibelaのZipを展開したディレクトリは必須です（-p PATH_TO_DIR）');
+    if (!options.userYaml)
+        throw new Error('Kiberaのユーザ設定ファイルが必要です（-u PATH_TO_FILE）');
     const n = new note_pm_1.default(options.accessToken, options.team);
     const k = new index_1.default(options.path);
     await k.loadFiles();
@@ -99,8 +101,13 @@ const findOrCreateFolder = async (note, folders, paths, parentFolder = null) => 
             const note = notes[group];
             // フォルダを確認
             let folder = null;
-            if (file.metadata.folder) {
-                folder = await findOrCreateFolder(note, folders, file.metadata.folder.split('/'));
+            if (file.metadata.folders.length > 0) {
+                for (const f of file.metadata.folders) {
+                    if (f.split(' / ')[0] === note.name) {
+                        folder = await findOrCreateFolder(note, folders, f.split(' / ')[1].split('/'));
+                        break;
+                    }
+                }
             }
             const ary = file.content.split(/\n/);
             const body = ary.slice(3).join("\n");
@@ -108,7 +115,7 @@ const findOrCreateFolder = async (note, folders, paths, parentFolder = null) => 
             console.log('');
             console.log(`　　タイトル： ${title}`);
             console.log(`　　ノート： ${group} => ${note.name}`);
-            console.log(`　　フォルダ： ${file.metadata.folder} => ${folder ? folder.name : 'なし'}, (${folder ? folder.folder_id : ''})`);
+            console.log(`　　フォルダ： ${file.metadata.folders} => ${folder ? folder.name : 'なし'}, (${folder ? folder.folder_id : ''})`);
             console.log(`    作成日： ${file.metadata.published_at}`);
             const page = new note_pm_1.Page({
                 title,
