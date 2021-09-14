@@ -101,13 +101,22 @@ const findOrCreateFolder = async (note, folders, paths, parentFolder = null) => 
             const note = notes[group];
             // フォルダを確認
             let folder = null;
-            if (file.metadata.folders.length > 0) {
-                for (const f of file.metadata.folders) {
-                    if (f.split(' / ')[0] === note.name) {
-                        folder = await findOrCreateFolder(note, folders, f.split(' / ')[1].split('/'));
-                        break;
+            if (file.metadata && file.metadata.folders) {
+                if (file.metadata.folders.length > 0) {
+                    for (const f of file.metadata.folders) {
+                        if (f.split(' / ')[0] === note.name) {
+                            folder = await findOrCreateFolder(note, folders, f.split(' / ')[1].split('/'));
+                            break;
+                        }
                     }
                 }
+            }
+            else {
+                console.log('メタデータにフォルダ情報がありません。このファイルは取り込めません');
+                console.log('=======以下デバッグ情報です=======');
+                console.log(file.metadata);
+                console.log('=======以上デバッグ情報です=======');
+                throw new Error('Unknown error');
             }
             const ary = file.content.split(/\n/);
             const body = ary.slice(3).join("\n");
