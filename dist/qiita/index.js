@@ -156,7 +156,7 @@ class QiitaTeam {
     }
     close() {
         var _a;
-        (_a = this.browser) === null || _a === void 0 ? void 0 : _a.close();
+        return (_a = this.browser) === null || _a === void 0 ? void 0 : _a.close();
     }
     attachmentDir() {
         return `${this.getDir()}/attachments`;

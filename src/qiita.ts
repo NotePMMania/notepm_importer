@@ -94,7 +94,7 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
   await q.open();
   await q.downloadImage();
   // await q.downloadAttachment();
-  q.close();
+  await q.close();
   console.log('画像をダウンロードしました');
   console.log('ユーザ一覧を読み込みます');
   await n.getUsers();

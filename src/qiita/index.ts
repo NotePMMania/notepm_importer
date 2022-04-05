@@ -173,7 +173,7 @@ class QiitaTeam {
   }
 
   close() {
-    this.browser?.close();
+    return this.browser?.close();
   }
 
   attachmentDir(): string {
