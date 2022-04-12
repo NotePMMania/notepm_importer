@@ -114,7 +114,6 @@ const prepareTag = async (n, q) => {
     console.log(`NotePMのアクセストークン： ${options.accessToken}`);
     console.log(`NotePMのドメイン： ${options.team}.notepm.jp`);
     console.log(`ユーザー設定用YAMLファイル： ${options.userYaml}`);
-    process.exit(0);
     const str = await util_1.promisify(fs_1.default.readFile)(options.userYaml, 'utf-8');
     const config = await js_yaml_1.default.load(str);
     const q = new qiita_1.default(options.path, options.qiita);
