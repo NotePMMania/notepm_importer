@@ -99,6 +99,22 @@ const prepareTag = async (n, q) => {
 (async (options) => {
     var _a, _b, _c;
     // if (!options.domain || !options.domain.match(/.*\.qiita\.com/) ) throw new Error('Qiitaのドメインが指定されていない、または qiita.com で終わっていません');
+    if (!options.path)
+        throw `取り込み対象のディレクトリが指定されていません（-p または --path）`;
+    if (!options.qiita)
+        throw `Qiita Teamのアクセストークンが指定されていません（-q または --qiita）`;
+    if (!options.accessToken)
+        throw `NotePMのアクセストークンが指定されていません（-a または --access-token）`;
+    if (!options.team)
+        throw `NotePMのドメインが指定されていません（-t または --team）`;
+    if (!options.userYaml)
+        throw `ユーザー設定用YAMLファイルが指定されていません（-u または --user-yaml）`;
+    console.log(`取り込み対象ディレクトリ： ${options.path}`);
+    console.log(`Qiita Teamへのアクセストークン： ${options.qiita}`);
+    console.log(`NotePMのアクセストークン： ${options.accessToken}`);
+    console.log(`NotePMのドメイン： ${options.team}.notepm.jp`);
+    console.log(`ユーザー設定用YAMLファイル： ${options.userYaml}`);
+    process.exit(0);
     const str = await util_1.promisify(fs_1.default.readFile)(options.userYaml, 'utf-8');
     const config = await js_yaml_1.default.load(str);
     const q = new qiita_1.default(options.path, options.qiita);
