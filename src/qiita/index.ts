@@ -1,30 +1,36 @@
-import puppeteer from 'puppeteer-core';
-import locateChrome from 'locate-chrome';
+// import puppeteer from 'puppeteer-core';
+// import locateChrome from 'locate-chrome';
 import fs from 'fs';
 import crypto from 'crypto';
 import { promisify } from 'util';
 import Article from './article';
 import Group from './group';
 import Project from './project';
+import axios from 'axios';
 
 class QiitaTeam {
-  public domain = '';
+  public qiitaToken = '';
   public dir = '';
   public articles: Article[] = [];
   public groups: Group[] = [];
   public projects: Project[] = [];
 
-  public page: puppeteer.Page | null = null;
-  public browser: puppeteer.Browser | null = null;
+  // public page: puppeteer.Page | null = null;
+  // public browser: puppeteer.Browser | null = null;
 
-  constructor(domain: string, dir: string) {
-    this.domain = domain;
+  constructor(dir: string, qiitaToken: string) {
+    this.qiitaToken = qiitaToken;
     this.dir = dir;
     Article.QiitaTeam = this;
     Project.QiitaTeam = this;
     Group.QiitaTeam = this;
   }
 
+  sleep(ms: number) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+  /*
   async launchChrome(): Promise<boolean> {
     try {
       // ブラウザ起動
@@ -53,6 +59,7 @@ class QiitaTeam {
       return false;
     }
   }
+  */
 
   load() {
     const p: Promise<void>[] = [];
@@ -100,6 +107,7 @@ class QiitaTeam {
     }
   }
 
+  /*
   getUrl(): string {
     if (this.domain.match(/https:\/\//)) {
       return this.domain;
@@ -111,6 +119,7 @@ class QiitaTeam {
   async getChromePath(): Promise<string> {
     return await locateChrome();
   }
+  */
 
   getImage(): string[] {
     let images = this.articles.map(a => a.getImage()).flat();
@@ -142,15 +151,18 @@ class QiitaTeam {
     await this.createDir();
     const files = this.getAttachment();
     const p: Promise<boolean>[] = [];
-    files.forEach(file => {
+    for (const file of files) {
+      await this.sleep(300);
       p.push(this.download(file));
-    });
+    };
     await Promise.all(p);
+    console.log(`添付ファイルのダウンロードが完了しました`);
   }
-
+  /*
   async open() {
     await this.launchChrome();
   }
+  */
 
   async createDir() {
     const fileDir = this.attachmentDir();
@@ -166,15 +178,18 @@ class QiitaTeam {
     await this.createDir();
     const images = this.getImage();
     const p: Promise<boolean>[] = [];
-    images.forEach(image => {
+    for (const image of images) {
+      await this.sleep(300);
       p.push(this.download(image));
-    });
+    }
     await Promise.all(p);
+    console.log(`画像のダウンロードが完了しました`);
   }
-
+  /*
   close() {
     return this.browser?.close();
   }
+  */
 
   attachmentDir(): string {
     return `${this.getDir()}/attachments`;
@@ -183,8 +198,8 @@ class QiitaTeam {
   filePath(url: string): string {
     const fileDir = this.attachmentDir();
     const hash = crypto.createHmac('sha256', 'notepm')
-                   .update(url)
-                   .digest('hex');
+      .update(url)
+      .digest('hex');
     return `${fileDir}/${hash}`;
   }
 
@@ -195,16 +210,18 @@ class QiitaTeam {
       return true;
     } catch (e) {}
     const buffer = await this.getBinary(url);
-    await promisify(fs.writeFile)(filePath, buffer);
+    await promisify(fs.writeFile)(filePath, Buffer.from(buffer.data));
     return true;
   }
 
   async getBinary(url: string): Promise<Buffer> {
-    const page = await this.browser!.newPage();
-    let loadPromise = page.waitForNavigation();
-    const bin = await page.goto(url);
-    await loadPromise;
-    return await bin.buffer();
+    console.log(`  ダウンロードするURL： ${url}`);
+    return axios.get(url, {
+      responseType: 'arraybuffer',
+      headers: {
+        'Authorization': `Bearer ${this.qiitaToken}`
+      }
+    });
   }
 }
 

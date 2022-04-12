@@ -14,7 +14,8 @@ const dir = process.argv[process.argv.length - 1];
 
 program
   .version('0.0.1')
-  .option('-d, --domain [domain]', 'Qiita::Teamのドメインを指定してください')
+  // .option('-d, --domain [domain]', 'Qiita::Teamのドメインを指定してください')
+  .option('-q --qiita [token]', 'Qiita::Teamへのアクセストークンを指定してください')
   .option('-p, --path [dir]', 'エクスポートしたZipファイルを展開したフォルダへのパスを指定してください')
   .option('-a, --access-token [accessToken]', 'notePMのアクセストークンを指定してください')
   .option('-t, --team [team]', 'notePMのチームドメインを入力してください')
@@ -83,18 +84,19 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
 }
 
 (async (options) => {
-  if (!options.domain || !options.domain.match(/.*\.qiita\.com/) ) throw new Error('Qiitaのドメインが指定されていない、または qiita.com で終わっていません');
+  // if (!options.domain || !options.domain.match(/.*\.qiita\.com/) ) throw new Error('Qiitaのドメインが指定されていない、または qiita.com で終わっていません');
   const str = await promisify(fs.readFile)(options.userYaml, 'utf-8');
   const config = await yaml.load(str) as Config;
-  const q = new QiitaTeam(options.domain, options.path);
+  const q = new QiitaTeam(options.path, options.qiita);
   const n = new NotePM(options.accessToken, options.team);
   await q.load();
   // ブラウザを立ち上げて画像をダウンロード
-  console.log('ブラウザを立ち上げます。Qiita Teamへログインしてください');
-  await q.open();
+  // console.log('ブラウザを立ち上げます。Qiita Teamへログインしてください');
+  // await q.open();
+  console.log('画像をダウンロードします');
   await q.downloadImage();
-  // await q.downloadAttachment();
-  await q.close();
+  await q.downloadAttachment();
+  // await q.close();
   console.log('画像をダウンロードしました');
   console.log('ユーザ一覧を読み込みます');
   await n.getUsers();

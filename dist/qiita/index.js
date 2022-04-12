@@ -3,54 +3,63 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const puppeteer_core_1 = __importDefault(require("puppeteer-core"));
-const locate_chrome_1 = __importDefault(require("locate-chrome"));
+// import puppeteer from 'puppeteer-core';
+// import locateChrome from 'locate-chrome';
 const fs_1 = __importDefault(require("fs"));
 const crypto_1 = __importDefault(require("crypto"));
 const util_1 = require("util");
 const article_1 = __importDefault(require("./article"));
 const group_1 = __importDefault(require("./group"));
 const project_1 = __importDefault(require("./project"));
+const axios_1 = __importDefault(require("axios"));
 class QiitaTeam {
-    constructor(domain, dir) {
-        this.domain = '';
+    // public page: puppeteer.Page | null = null;
+    // public browser: puppeteer.Browser | null = null;
+    constructor(dir, qiitaToken) {
+        this.qiitaToken = '';
         this.dir = '';
         this.articles = [];
         this.groups = [];
         this.projects = [];
-        this.page = null;
-        this.browser = null;
-        this.domain = domain;
+        this.qiitaToken = qiitaToken;
         this.dir = dir;
         article_1.default.QiitaTeam = this;
         project_1.default.QiitaTeam = this;
         group_1.default.QiitaTeam = this;
     }
-    async launchChrome() {
-        try {
-            // ブラウザ起動
-            this.browser = await puppeteer_core_1.default.launch({
-                headless: false,
-                executablePath: await this.getChromePath(),
-                ignoreDefaultArgs: ['--guest', '--disable-extensions', '--start-fullscreen', '--incognito',],
-                slowMo: 150,
-            });
-            const page = await this.browser.newPage();
-            const navigationPromise = page.waitForNavigation();
-            await page.goto(this.getUrl());
-            await page.setViewport({ width: 1200, height: 900 });
-            await navigationPromise;
-            // ログイン待ち
-            await page.waitForFunction(() => {
-                return document.querySelector('.sharedHeader_newItem_btn');
-            }, { timeout: 0 });
-            return true;
-        }
-        catch (e) {
-            console.log(e);
-            return false;
-        }
+    sleep(ms) {
+        return new Promise(r => setTimeout(r, ms));
     }
+    /*
+    async launchChrome(): Promise<boolean> {
+      try {
+        // ブラウザ起動
+        this.browser = await puppeteer.launch({
+          headless: false,
+          executablePath: await this.getChromePath(),
+          ignoreDefaultArgs: ['--guest', '--disable-extensions','--start-fullscreen','--incognito',],
+          slowMo:150,
+        });
+  
+        const page = await this.browser.newPage();
+        const navigationPromise = page.waitForNavigation();
+  
+        await page.goto(this.getUrl());
+        await page.setViewport({ width: 1200, height: 900 });
+        await navigationPromise;
+  
+        // ログイン待ち
+        await page.waitForFunction(() => {
+          return document.querySelector('.sharedHeader_newItem_btn');
+        },  { timeout: 0 });
+  
+        return true;
+      } catch (e) {
+        console.log(e);
+        return false;
+      }
+    }
+    */
     load() {
         const p = [];
         p.push(this.loadArticles());
@@ -92,17 +101,19 @@ class QiitaTeam {
             return `${this.dir}/`;
         }
     }
-    getUrl() {
-        if (this.domain.match(/https:\/\//)) {
-            return this.domain;
-        }
-        else {
-            return `https://${this.domain}`;
-        }
+    /*
+    getUrl(): string {
+      if (this.domain.match(/https:\/\//)) {
+        return this.domain;
+      } else {
+        return `https://${this.domain}`;
+      }
     }
-    async getChromePath() {
-        return await locate_chrome_1.default();
+    
+    async getChromePath(): Promise<string> {
+      return await locateChrome();
     }
+    */
     getImage() {
         let images = this.articles.map(a => a.getImage()).flat();
         images = images.concat(this.projects.map(p => p.getImage()).flat());
@@ -127,14 +138,19 @@ class QiitaTeam {
         await this.createDir();
         const files = this.getAttachment();
         const p = [];
-        files.forEach(file => {
+        for (const file of files) {
+            await this.sleep(300);
             p.push(this.download(file));
-        });
+        }
+        ;
         await Promise.all(p);
+        console.log(`添付ファイルのダウンロードが完了しました`);
     }
+    /*
     async open() {
-        await this.launchChrome();
+      await this.launchChrome();
     }
+    */
     async createDir() {
         const fileDir = this.attachmentDir();
         try {
@@ -149,15 +165,18 @@ class QiitaTeam {
         await this.createDir();
         const images = this.getImage();
         const p = [];
-        images.forEach(image => {
+        for (const image of images) {
+            await this.sleep(300);
             p.push(this.download(image));
-        });
+        }
         await Promise.all(p);
+        console.log(`画像のダウンロードが完了しました`);
     }
+    /*
     close() {
-        var _a;
-        return (_a = this.browser) === null || _a === void 0 ? void 0 : _a.close();
+      return this.browser?.close();
     }
+    */
     attachmentDir() {
         return `${this.getDir()}/attachments`;
     }
@@ -176,15 +195,17 @@ class QiitaTeam {
         }
         catch (e) { }
         const buffer = await this.getBinary(url);
-        await util_1.promisify(fs_1.default.writeFile)(filePath, buffer);
+        await util_1.promisify(fs_1.default.writeFile)(filePath, Buffer.from(buffer.data));
         return true;
     }
     async getBinary(url) {
-        const page = await this.browser.newPage();
-        let loadPromise = page.waitForNavigation();
-        const bin = await page.goto(url);
-        await loadPromise;
-        return await bin.buffer();
+        console.log(`  ダウンロードするURL： ${url}`);
+        return axios_1.default.get(url, {
+            responseType: 'arraybuffer',
+            headers: {
+                'Authorization': `Bearer ${this.qiitaToken}`
+            }
+        });
     }
 }
 exports.default = QiitaTeam;
