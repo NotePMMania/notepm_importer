@@ -216,11 +216,13 @@ class QiitaTeam {
 
   async getBinary(url: string): Promise<Buffer> {
     console.log(`  ダウンロードするURL： ${url}`);
+    const headers = {};
+    if (url.match(/https?:\/\/.*?\.qiita\.com\//)) {
+      headers['Authorization'] = `Bearer ${this.qiitaToken}`;
+    }
     return axios.get(url, {
       responseType: 'arraybuffer',
-      headers: {
-        'Authorization': `Bearer ${this.qiitaToken}`
-      }
+      headers
     });
   }
 }
