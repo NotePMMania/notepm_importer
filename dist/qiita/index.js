@@ -194,8 +194,13 @@ class QiitaTeam {
             return true;
         }
         catch (e) { }
-        const buffer = await this.getBinary(url);
-        await util_1.promisify(fs_1.default.writeFile)(filePath, Buffer.from(buffer.data));
+        try {
+            const buffer = await this.getBinary(url);
+            await util_1.promisify(fs_1.default.writeFile)(filePath, Buffer.from(buffer.data));
+        }
+        catch (e) {
+            console.log(`  ダウンロード失敗しました ${url}`);
+        }
         return true;
     }
     async getBinary(url) {

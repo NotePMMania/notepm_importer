@@ -209,8 +209,12 @@ class QiitaTeam {
       const bol = fs.statSync(filePath);
       return true;
     } catch (e) {}
-    const buffer = await this.getBinary(url);
-    await promisify(fs.writeFile)(filePath, Buffer.from(buffer.data));
+    try {
+      const buffer = await this.getBinary(url);
+      await promisify(fs.writeFile)(filePath, Buffer.from(buffer.data));
+    } catch (e) {
+      console.log(`  ダウンロード失敗しました ${url}`);
+    }
     return true;
   }
 
