@@ -63,24 +63,37 @@ const executeProject = async (q: QiitaTeam) => {
 
 
 const prepareTag = async (n: NotePM, q: QiitaTeam) => {
-  await n.getTags();
+  console.log(`  タグを取得します`);
+  try {
+    await n.getTags();
+  } catch (e) {
+    console.log(`  タグの取得に失敗しました。終了します。`);
+    process.exit(1);
+  }
+  console.log(`  Qiita記事からのタグを取得します`);
   const names =  Array.from(new Set(q.articles.map(a => a.tags?.map(a => a.name)).flat()));
+  console.log(`  Qiita記事から${names.length}件のタグを取得しました`);
   const tagNames: string[] = [];
+  console.log(`  未設定のタグがあるか確認します`);
   names.forEach(t => {
     const bol = n.tags.filter(tag => tag.name == t)[0];
     if (!bol) {
       tagNames.push(t!);
     }
   });
+  console.log(`  未設定のタグは${tagNames.length}件です`);
   if (tagNames.length === 0) return;
   const tags = await Promise.all(tagNames.map(async name => {
+    console.log(`    タグ${name}を作成します`);
     const t = new Tag({
       name: name!
     });
     await t.save();
+    console.log(`    タグ${name}を作成しました`);
     return t;
   }));
   tags.forEach(t => n.tags.push(t));
+  console.log(`  タグの準備完了です`);
 }
 
 (async (options) => {

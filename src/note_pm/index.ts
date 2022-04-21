@@ -36,7 +36,9 @@ class NotePM {
   }
 
   async getTags(): Promise<void> {
+    console.log(`  NotePMからタグを取得します`);
     this.tags = await Tag.fetchAll();
+    console.log(`  NotePMよりタグを取得しました`);
   }
 
   findUser(name: string): string | null {
