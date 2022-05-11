@@ -75,6 +75,7 @@ const executeProject = async (q) => {
         await page.updateImageBody(q);
     });
 };
+const sleep = (ms) => new Promise(res => setTimeout(res, ms));
 const prepareTag = async (n, q) => {
     console.log(`  タグを取得します`);
     try {
@@ -98,31 +99,43 @@ const prepareTag = async (n, q) => {
     console.log(`  未設定のタグは${tagNames.length}件です`);
     if (tagNames.length === 0)
         return;
-    const tags = await Promise.all(tagNames.map(async (name) => {
+    const tags = [];
+    for (const name of tagNames) {
         console.log(`    タグ${name}を作成します`);
         const t = new note_pm_1.Tag({
             name: name
         });
         await t.save();
         console.log(`    タグ${name}を作成しました`);
-        return t;
-    }));
+        sleep(500);
+        tags.push(t);
+    }
     tags.forEach(t => n.tags.push(t));
     console.log(`  タグの準備完了です`);
 };
 (async (options) => {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     // if (!options.domain || !options.domain.match(/.*\.qiita\.com/) ) throw new Error('Qiitaのドメインが指定されていない、または qiita.com で終わっていません');
-    if (!options.path)
-        throw `取り込み対象のディレクトリが指定されていません（-p または --path）`;
-    if (!options.qiita)
-        throw `Qiita Teamのアクセストークンが指定されていません（-q または --qiita）`;
-    if (!options.accessToken)
-        throw `NotePMのアクセストークンが指定されていません（-a または --access-token）`;
-    if (!options.team)
-        throw `NotePMのドメインが指定されていません（-t または --team）`;
-    if (!options.userYaml)
-        throw `ユーザー設定用YAMLファイルが指定されていません（-u または --user-yaml）`;
+    if (!options.path) {
+        console.log(`取り込み対象のディレクトリが指定されていません（-p または --path）`);
+        process.exit(1);
+    }
+    if (!options.qiita) {
+        console.log(`Qiita Teamのアクセストークンが指定されていません（-q または --qiita）`);
+        process.exit(1);
+    }
+    if (!options.accessToken) {
+        console.log(`NotePMのアクセストークンが指定されていません（-a または --access-token）`);
+        process.exit(1);
+    }
+    if (!options.team) {
+        console.log(`NotePMのドメインが指定されていません（-t または --team）`);
+        process.exit(1);
+    }
+    if (!options.userYaml) {
+        console.log(`ユーザー設定用YAMLファイルが指定されていません（-u または --user-yaml）`);
+        process.exit(1);
+    }
     console.log(`取り込み対象ディレクトリ： ${options.path}`);
     console.log(`Qiita Teamへのアクセストークン： ${options.qiita}`);
     console.log(`NotePMのアクセストークン： ${options.accessToken}`);
@@ -161,8 +174,8 @@ const prepareTag = async (n, q) => {
         executeProject(q);
     // グループごとにノートを作成
     console.log('グループのノートを作成します');
-    const groups = await Promise.all(q.groups.map(async (g) => {
-        var _a;
+    const groups = [];
+    for (const g of q.groups) {
         const note = new note_pm_1.Note({
             name: g.name,
             description: 'Qiita::Teamからのインポート',
@@ -177,8 +190,10 @@ const prepareTag = async (n, q) => {
         });
         console.log(`  ${g.name}を作成します`);
         await note.save();
-        return note;
-    }));
+        console.log(`  ${g.name}を作成しました`);
+        groups.push(note);
+    }
+    console.log('グループのノートを作成しました');
     console.log('ページを作成します');
     for (const a of q.articles) {
         const page = new note_pm_1.Page({
@@ -210,18 +225,18 @@ const prepareTag = async (n, q) => {
             console.log(`    画像のURLに合わせてページ内容を更新しました`);
         }
         // コメントの反映
-        if (((_a = a.comments) === null || _a === void 0 ? void 0 : _a.length) > 0) {
+        if (((_b = a.comments) === null || _b === void 0 ? void 0 : _b.length) > 0) {
             if (!page.page_code) {
                 // console.error(`データがありません： ${JSON.stringify(a)}`);
                 console.log(`データがありません ${page.title} : ${a.title}`);
                 return;
             }
-            console.log(`  コメントが${(_b = a.comments) === null || _b === void 0 ? void 0 : _b.length}件あります（ページコード： ${page.page_code}） ${page.title}`);
+            console.log(`  コメントが${(_c = a.comments) === null || _c === void 0 ? void 0 : _c.length}件あります（ページコード： ${page.page_code}） ${page.title}`);
             for (const c of a.comments) {
                 const comment = new note_pm_1.Comment({
                     page_code: page.page_code,
                     created_at: c.created_at,
-                    user: (_c = c.user) === null || _c === void 0 ? void 0 : _c.id,
+                    user: (_d = c.user) === null || _d === void 0 ? void 0 : _d.id,
                     body: c.body
                 });
                 console.log(`  コメントを保存します`);

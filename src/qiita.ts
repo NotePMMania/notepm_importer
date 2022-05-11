@@ -61,6 +61,7 @@ const executeProject = async (q: QiitaTeam) => {
   });
 }
 
+const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 const prepareTag = async (n: NotePM, q: QiitaTeam) => {
   console.log(`  タグを取得します`);
@@ -83,26 +84,43 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
   });
   console.log(`  未設定のタグは${tagNames.length}件です`);
   if (tagNames.length === 0) return;
-  const tags = await Promise.all(tagNames.map(async name => {
+  const tags: Tag[] = [];
+  for (const name of tagNames) {
     console.log(`    タグ${name}を作成します`);
     const t = new Tag({
       name: name!
     });
     await t.save();
     console.log(`    タグ${name}を作成しました`);
-    return t;
-  }));
+    sleep(500);
+    tags.push(t);
+  }
   tags.forEach(t => n.tags.push(t));
   console.log(`  タグの準備完了です`);
 }
 
 (async (options) => {
   // if (!options.domain || !options.domain.match(/.*\.qiita\.com/) ) throw new Error('Qiitaのドメインが指定されていない、または qiita.com で終わっていません');
-  if (!options.path) throw `取り込み対象のディレクトリが指定されていません（-p または --path）`
-  if (!options.qiita) throw `Qiita Teamのアクセストークンが指定されていません（-q または --qiita）`
-  if (!options.accessToken) throw `NotePMのアクセストークンが指定されていません（-a または --access-token）`
-  if (!options.team) throw `NotePMのドメインが指定されていません（-t または --team）`
-  if (!options.userYaml) throw `ユーザー設定用YAMLファイルが指定されていません（-u または --user-yaml）`
+  if (!options.path) {
+    console.log(`取り込み対象のディレクトリが指定されていません（-p または --path）`);
+    process.exit(1);
+  }
+  if (!options.qiita) {
+    console.log(`Qiita Teamのアクセストークンが指定されていません（-q または --qiita）`);
+    process.exit(1);
+  }
+  if (!options.accessToken) {
+    console.log(`NotePMのアクセストークンが指定されていません（-a または --access-token）`);
+    process.exit(1);
+  }
+  if (!options.team) {
+    console.log(`NotePMのドメインが指定されていません（-t または --team）`);
+    process.exit(1);
+  }
+  if (!options.userYaml) {
+    console.log(`ユーザー設定用YAMLファイルが指定されていません（-u または --user-yaml）`);
+    process.exit(1);
+  }
   console.log(`取り込み対象ディレクトリ： ${options.path}`);
   console.log(`Qiita Teamへのアクセストークン： ${options.qiita}`);
   console.log(`NotePMのアクセストークン： ${options.accessToken}`);
@@ -142,7 +160,8 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
 
   // グループごとにノートを作成
   console.log('グループのノートを作成します');
-  const groups = await Promise.all(q.groups.map(async g => {
+  const groups: Note[] = [];
+  for (const g of q.groups) {
     const note = new Note({
       name: g.name,
       description: 'Qiita::Teamからのインポート',
@@ -156,8 +175,10 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
     });
     console.log(`  ${g.name}を作成します`);
     await note.save();
-    return note;
-  }));
+    console.log(`  ${g.name}を作成しました`);
+    groups.push(note);
+  }
+  console.log('グループのノートを作成しました');
 
   console.log('ページを作成します');
   for (const a of q.articles) {
