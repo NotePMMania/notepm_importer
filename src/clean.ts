@@ -7,6 +7,7 @@ import NotePM, {Note, Folder, Page, Tag, User} from './note_pm';
 import Attachment from './note_pm/attachment';
 import { fstat } from 'fs';
 import { promisify } from 'util';
+import { debugPrint } from './func';
 
 const dir = process.argv[process.argv.length - 1];
 
@@ -24,12 +25,12 @@ const options = program.opts();
   const notes = await Note.fetchAll();
   if (!notes) return;
   if (notes.length > 0) {
-    console.log(`ノートが ${notes.length}件あります`);
+    debugPrint(`ノートが ${notes.length}件あります`);
     await Promise.all(notes.map(async n => {
       await n.delete();
     }));
   }
-  console.log(`終了しました`);
+  debugPrint(`終了しました`);
 })(options);
 
 

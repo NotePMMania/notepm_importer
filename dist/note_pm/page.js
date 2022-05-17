@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const user_1 = __importDefault(require("./user"));
 const attachment_1 = __importDefault(require("./attachment"));
 const dayjs_1 = __importDefault(require("dayjs"));
+const func_1 = require("../func");
 class Page {
     constructor(params) {
         this.page_code = '';
@@ -114,7 +115,7 @@ class Page {
         for (const url of images) {
             const filePath = q ? q.filePath(url) : `${dir}${url}`;
             const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
-            console.log(`    ${this.title}に画像をアップロードします。 ${fileName}`);
+            func_1.debugPrint(`    ${this.title}に画像をアップロードします。 ${fileName}`);
             try {
                 const attachment = await attachment_1.default.add(this, fileName, filePath);
                 urls.push({
@@ -123,14 +124,14 @@ class Page {
                 });
             }
             catch (e) {
-                console.log(`      アップロードをスキップしました。 ${fileName}`);
+                func_1.debugPrint(`      アップロードをスキップしました。 ${fileName}`);
             }
         }
         urls.forEach(params => {
             const r = new RegExp(params.url, 'gs');
             this.body = this.body.replace(r, params.download_url);
         });
-        console.log(`    ${this.title}を更新します`);
+        func_1.debugPrint(`    ${this.title}を更新します`);
         await this.save();
     }
 }

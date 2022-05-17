@@ -9,6 +9,7 @@ const fs_1 = __importDefault(require("fs"));
 const util_1 = require("util");
 const crypto_1 = __importDefault(require("crypto"));
 const parse_md_1 = __importDefault(require("parse-md"));
+const func_1 = require("../func");
 class Esa {
     constructor(domain, dir) {
         this.domain = '';
@@ -127,7 +128,7 @@ class Esa {
             return true;
         }
         catch (e) {
-            console.log(e);
+            func_1.debugPrint(e);
             return false;
         }
     }

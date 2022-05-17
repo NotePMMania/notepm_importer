@@ -29,6 +29,7 @@ const note_pm_1 = __importStar(require("./note_pm/"));
 const util_1 = require("util");
 const papaparse_1 = __importDefault(require("papaparse"));
 const iconv_lite_1 = __importDefault(require("iconv-lite"));
+const func_1 = require("./func");
 const dir = process.argv[process.argv.length - 1];
 commander_1.program
     .version('0.0.1')
@@ -40,7 +41,7 @@ const options = commander_1.program.opts();
 (async (options) => {
     const n = new note_pm_1.default(options.accessToken, options.team);
     await n.getUsers();
-    console.log('ノート「インポート」を作成します');
+    func_1.debugPrint('ノート「インポート」を作成します');
     const note = new note_pm_1.Note({
         name: 'インポート',
         description: 'CSVからインポートしたノート',
@@ -58,7 +59,7 @@ const options = commander_1.program.opts();
     const csv = iconv_lite_1.default.decode(buf, 'Shift_JIS');
     const ary = papaparse_1.default.parse(csv, { header: true });
     for (const params of ary.data) {
-        console.log(`ページ「${params.title}」を作成します`);
+        func_1.debugPrint(`ページ「${params.title}」を作成します`);
         const page = new note_pm_1.Page({
             note_code: note.note_code,
             title: params.title,

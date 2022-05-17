@@ -28,6 +28,7 @@ const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
 const note_pm_1 = __importStar(require("./note_pm/"));
 const util_1 = require("util");
+const func_1 = require("./func");
 // import FileDir from './file/index';
 const dir = process.argv[process.argv.length - 1];
 commander_1.program
@@ -57,13 +58,13 @@ const importExecute = async (note, folder, dir) => {
             try {
                 await f.save(note);
                 if (folder) {
-                    console.log(`  フォルダ ${folder.name} の下にフォルダ ${f.name} を作成しました`);
+                    func_1.debugPrint(`  フォルダ ${folder.name} の下にフォルダ ${f.name} を作成しました`);
                 }
                 await importExecute(note, f, dirPath);
             }
             catch (e) {
-                console.log(`  フォルダ ${folder.name} の下にフォルダ ${f.name} を作成しようとしてエラーが発生しました`);
-                console.log(`  ${e.message}`);
+                func_1.debugPrint(`  フォルダ ${folder.name} の下にフォルダ ${f.name} を作成しようとしてエラーが発生しました`);
+                func_1.debugPrint(`  ${e.message}`);
                 process.exit(1);
             }
         }
@@ -79,10 +80,10 @@ const importExecute = async (note, folder, dir) => {
             });
             await page.save();
             if (folder) {
-                console.log(`  フォルダ ${folder.name} の下にページ ${page.title} を作成しました ${folder.folder_id}`);
+                func_1.debugPrint(`  フォルダ ${folder.name} の下にページ ${page.title} を作成しました ${folder.folder_id}`);
             }
             else {
-                console.log(`  ノート ${note.name} の下にページ ${page.title} を作成しました`);
+                func_1.debugPrint(`  ノート ${note.name} の下にページ ${page.title} を作成しました`);
             }
             // ファイルアップロード
             const attachment = await note_pm_1.Attachment.add(page, basename, dirPath);

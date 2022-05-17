@@ -5,6 +5,7 @@ import fs from 'fs';
 import NotePM, {Note, Folder, Page, Tag, Comment, Attachment, User} from './note_pm/';
 import { promisify } from 'util';
 import mammoth from 'mammoth';
+import { debugPrint } from './func';
 
 const dir = process.argv[process.argv.length - 1];
 
@@ -26,7 +27,7 @@ const options = program.opts();
     await promisify(fs.mkdir)(`${dir}images`);
   }
 
-  console.log('ノート「インポート」を作成します');
+  debugPrint('ノート「インポート」を作成します');
   const note = new Note({
     name: 'インポート',
     description: 'フォルダからインポートしたノート',
@@ -41,12 +42,12 @@ const options = program.opts();
     const file = await promisify(fs.stat)(dirPath);
     if (file.isDirectory()) continue;
     if (!filePath.match(/\.docx$/)) {
-      console.log(`docx以外のファイル形式には対応していません。スキップします ${filePath}`);
+      debugPrint(`docx以外のファイル形式には対応していません。スキップします ${filePath}`);
       continue;
     }
     const word = await mammoth.convertToMarkdown({path: dirPath});
     const basename = path.basename(filePath).normalize('NFC');
-    console.log(`Wordファイル ${basename} を処理します`);
+    debugPrint(`Wordファイル ${basename} を処理します`);
     const title = basename.match(/.*\..*$/) ? basename.replace(/(.*)\..*$/, "$1") : basename;
     const page = new Page({
       note_code: note.note_code,
@@ -55,17 +56,17 @@ const options = program.opts();
       memo: ''
     });
     await page.save();
-    console.log(`ページ ${title} を作成しました`);
+    debugPrint(`ページ ${title} を作成しました`);
     const match = word.value.match(/!\[.*?\]\((.*?)\)/sg);
     if (match) {
-      console.log(`  画像を処理します`);
+      debugPrint(`  画像を処理します`);
       for (const source of match) {
         const src = source.replace(/!\[.*?\]\(/, '').replace(/\)$/, '');
         const type = src.split(',')[0].replace(/data:(.*);.*/, "$1");
         const ext = type.split('/')[1];
         const data = src.split(',')[1];
         const localFileName = `${(new Date).getTime()}.${ext}`;
-        console.log(`  画像 ${localFileName} をアップロードします`);
+        debugPrint(`  画像 ${localFileName} をアップロードします`);
         const localPath = `${dir}images/${localFileName}`;
         await promisify(fs.writeFile)(localPath, data, 'base64');
         const attachment = await Attachment.add(page, localFileName, localPath);
@@ -74,7 +75,7 @@ const options = program.opts();
         await promisify(fs.unlink)(localPath);
       }
     }
-    console.log(`  ページ本文を更新します`);
+    debugPrint(`  ページ本文を更新します`);
     page.body = word.value;
     await page.save();
   }

@@ -22,6 +22,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const note_pm_1 = __importStar(require("./note_pm"));
+const func_1 = require("./func");
 const dir = process.argv[process.argv.length - 1];
 commander_1.program
     .version('0.0.1')
@@ -35,10 +36,10 @@ const options = commander_1.program.opts();
     if (!notes)
         return;
     if (notes.length > 0) {
-        console.log(`ノートが ${notes.length}件あります`);
+        func_1.debugPrint(`ノートが ${notes.length}件あります`);
         await Promise.all(notes.map(async (n) => {
             await n.delete();
         }));
     }
-    console.log(`終了しました`);
+    func_1.debugPrint(`終了しました`);
 })(options);

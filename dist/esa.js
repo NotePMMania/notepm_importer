@@ -26,6 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const commander_1 = require("commander");
 const note_pm_1 = __importStar(require("./note_pm/"));
 const index_1 = __importDefault(require("./esa/index"));
+const func_1 = require("./func");
 const dir = process.argv[process.argv.length - 1];
 commander_1.program
     .version('0.0.1')
@@ -68,8 +69,8 @@ const prepareFolder = async (note, dirs, parentFolder) => {
             await folder.save(note);
         }
         catch (e) {
-            console.error(`フォルダの作成に失敗しました： ${folder.name}`);
-            console.error(`エラーメッセージ${e.message}`);
+            func_1.debugPrint(`フォルダの作成に失敗しました： ${folder.name}`);
+            func_1.debugPrint(`エラーメッセージ${e.message}`);
             process.exit(1);
         }
         res.folder = folder;
@@ -108,7 +109,7 @@ const findNoteOrFolder = (dirs, category) => {
     let tags = [];
     for (const file in e.files) {
         const params = e.files[file];
-        // console.log(file);
+        // debugPrint(file);
         (params.metadata.tags || '')
             .split(',')
             .map(s => s.trim())
@@ -132,15 +133,15 @@ const findNoteOrFolder = (dirs, category) => {
     // ページの作成
     for (const file in e.files) {
         const params = e.files[file];
-        // console.log(file);
+        // debugPrint(file);
         const { metadata } = params;
-        console.log(`  ページタイトル： ${metadata.title}`);
-        console.log(`  カテゴリ： ${metadata.category}`);
+        func_1.debugPrint(`  ページタイトル： ${metadata.title}`);
+        func_1.debugPrint(`  カテゴリ： ${metadata.category}`);
         const { note, folder } = findNoteOrFolder(ary, metadata.category);
-        console.log(`  ノート： ${note.note_code}`);
-        console.log(`  フォルダ： ${folder === null || folder === void 0 ? void 0 : folder.folder_id}`);
+        func_1.debugPrint(`  ノート： ${note.note_code}`);
+        func_1.debugPrint(`  フォルダ： ${folder === null || folder === void 0 ? void 0 : folder.folder_id}`);
         const tags = (metadata.tags || '').split(',').map(s => s.trim()).filter(s => s !== '').map(s => new note_pm_1.Tag({ name: s }));
-        console.log(`  タグ： ${tags.map(t => t.name).join(', ')}`);
+        func_1.debugPrint(`  タグ： ${tags.map(t => t.name).join(', ')}`);
         const page = new note_pm_1.Page({
             title: metadata.title,
             body: params.content,

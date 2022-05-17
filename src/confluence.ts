@@ -8,6 +8,7 @@ import { promisify } from 'util';
 import { JSDOM } from 'jsdom';
 import TurndownService from 'turndown';
 import * as turndownPluginGfm from 'turndown-plugin-gfm';
+import { debugPrint } from './func';
 const tables = turndownPluginGfm.tables
 const turndown = new TurndownService();
 turndown.use(tables);
@@ -76,14 +77,14 @@ const generatePage = async (dir: string, config, note: Note, ary: any[], folder?
     let f;
     if (params.child.length > 0) {
       // フォルダを作る
-      console.log(`フォルダを作成します ${params.name}`);
+      debugPrint(`フォルダを作成します ${params.name}`);
       f = new Folder({
         parent_folder_id: folder ? folder.folder_id : null,
         name: params.name,
       });
       await f.save(note);
     }
-    console.log(`ページを作成します ${params.name}`);
+    debugPrint(`ページを作成します ${params.name}`);
     const page = new Page({
       note_code: note.note_code,
       title: params.name,
@@ -95,7 +96,7 @@ const generatePage = async (dir: string, config, note: Note, ary: any[], folder?
     if (u) {
       page.user = u.user_code;
     }
-    console.log(`  作成者は ${page.user} とします`);
+    debugPrint(`  作成者は ${page.user} とします`);
     await page.save();
     await uploadAttachment(dir, page, params.content);
     if (params.child.length > 0) {
@@ -108,22 +109,22 @@ const uploadAttachment = async (dir: string, page: Page, body: string) => {
   const match = body.match(/!\[.*?\]\((.*?)\)/mg);
   page.body = body;
   if (!match) {
-    console.log(`  画像はありません`);
+    debugPrint(`  画像はありません`);
     await page.save();
     return;
   }
-  console.log(match);
-  console.log(`  画像をアップロードします`);
+  debugPrint(match);
+  debugPrint(`  画像をアップロードします`);
   for (const source of match) {
     const src = source.replace(/!\[.*?\]\(/, '').replace(/\)$/, '').replace(/\?.*$/, '');
     const localFileName = path.basename(src);
-    console.log(`    ファイル名 ${localFileName}`);
+    debugPrint(`    ファイル名 ${localFileName}`);
     const localPath = `${dir}${src}`;
     const attachment = await Attachment.add(page, localFileName, localPath);
     const url = attachment.download_url.replace(/https:\/\/(.*?)\.notepm\.jp\/api\/v1\/attachments\/download\//, "https://$1.notepm.jp/private/");
     page.body = page.body.replace(src, url);
   }
-  console.log(`  画像アップロード完了しました`);
+  debugPrint(`  画像アップロード完了しました`);
   await page.save();
 }
 

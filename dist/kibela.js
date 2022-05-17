@@ -29,6 +29,7 @@ const js_yaml_1 = __importDefault(require("js-yaml"));
 const note_pm_1 = __importStar(require("./note_pm/"));
 const util_1 = require("util");
 const index_1 = __importDefault(require("./kibela/index"));
+const func_1 = require("./func");
 const dir = process.argv[process.argv.length - 1];
 commander_1.program
     .version('0.0.1')
@@ -46,9 +47,9 @@ const findOrCreateFolder = async (note, folders, paths, parentFolder = null) => 
             parent_folder_id: parentFolder ? parentFolder.folder_id : null,
             note_code: note.note_code,
         });
-        console.log(`　　存在しないフォルダを作成します`);
-        console.log(`　　ノート： ${note.name}`);
-        console.log(`　　フォルダ名： ${paths[0]}`);
+        func_1.debugPrint(`　　存在しないフォルダを作成します`);
+        func_1.debugPrint(`　　ノート： ${note.name}`);
+        func_1.debugPrint(`　　フォルダ名： ${paths[0]}`);
         await n.save(note);
         folder = {
             folder: n,
@@ -112,20 +113,20 @@ const findOrCreateFolder = async (note, folders, paths, parentFolder = null) => 
                 }
             }
             else {
-                console.log('メタデータにフォルダ情報がありません。このファイルは取り込めません');
-                console.log('=======以下デバッグ情報です=======');
-                console.log(file.metadata);
-                console.log('=======以上デバッグ情報です=======');
+                func_1.debugPrint('メタデータにフォルダ情報がありません。このファイルは取り込めません');
+                func_1.debugPrint('=======以下デバッグ情報です=======');
+                func_1.debugPrint(file.metadata);
+                func_1.debugPrint('=======以上デバッグ情報です=======');
                 throw new Error('Unknown error');
             }
             const ary = file.content.split(/\n/);
             const body = ary.slice(3).join("\n");
             const title = ary.filter(s => s !== '')[0].replace(/^# /, '');
-            console.log('');
-            console.log(`　　タイトル： ${title}`);
-            console.log(`　　ノート： ${group} => ${note.name}`);
-            console.log(`　　フォルダ： ${file.metadata.folders} => ${folder ? folder.name : 'なし'}, (${folder ? folder.folder_id : ''})`);
-            console.log(`    作成日： ${file.metadata.published_at}`);
+            func_1.debugPrint('');
+            func_1.debugPrint(`　　タイトル： ${title}`);
+            func_1.debugPrint(`　　ノート： ${group} => ${note.name}`);
+            func_1.debugPrint(`　　フォルダ： ${file.metadata.folders} => ${folder ? folder.name : 'なし'}, (${folder ? folder.folder_id : ''})`);
+            func_1.debugPrint(`    作成日： ${file.metadata.published_at}`);
             const page = new note_pm_1.Page({
                 title,
                 body,

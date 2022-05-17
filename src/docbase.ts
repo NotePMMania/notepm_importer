@@ -6,6 +6,7 @@ import yaml from 'js-yaml';
 import NotePM, {Note, Folder, Page, Tag, Comment, Attachment, User} from './note_pm/';
 import { promisify } from 'util';
 import Docbase from './docbase/index';
+import { debugPrint } from './func';
 
 const dir = process.argv[process.argv.length - 1];
 
@@ -55,10 +56,10 @@ const options = program.opts();
   const tags = [];
   for (const fileName in d.contents) {
     const file = d.contents[fileName];
-    console.log(`    タグ作成開始`);
+    debugPrint(`    タグ作成開始`);
     for (const tag of file.tags) {
       if (tags.indexOf(tag.name) > -1) continue;
-      console.log(`      タグ： ${tag.name}`);
+      debugPrint(`      タグ： ${tag.name}`);
       const t = new Tag({
         name: tag.name,
       });
@@ -67,16 +68,16 @@ const options = program.opts();
       } catch (e) {
       }
     }
-    console.log(`    タグ保存完了`);
+    debugPrint(`    タグ保存完了`);
     // 該当するノートを抽出
     if (file.groups.length === 0) file.groups.push({name: 'ルート'});
     for (const group of file.groups) {
       const note = notes[group.name];
       const body = file.body;
       const title = file.title;
-      console.log('');
-      console.log(`    タイトル： ${title}`);
-      console.log(`    ノート： ${group.name} => ${note.name}`);
+      debugPrint('');
+      debugPrint(`    タイトル： ${title}`);
+      debugPrint(`    ノート： ${group.name} => ${note.name}`);
       const page = new Page({
         title,
         body,
@@ -88,7 +89,7 @@ const options = program.opts();
       page.user = file.user.name;
       await page.save();
       await page.updateImageBody(null, `${d.dir}/attachments/`);
-      console.log(`    ページID： ${page.page_code}`)
+      debugPrint(`    ページID： ${page.page_code}`)
       // コメント投稿
       if (file.comments) {
         for (const c of file.comments) {

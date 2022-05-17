@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const attachment_1 = __importDefault(require("./attachment"));
 const page_1 = __importDefault(require("./page"));
 const dayjs_1 = __importDefault(require("dayjs"));
+const func_1 = require("../func");
 class Comment {
     constructor(params) {
         this.page_code = '';
@@ -61,7 +62,7 @@ class Comment {
     async updateImageBody(q, page, dir = '') {
         const images = this.images();
         const urls = [];
-        console.log(`      コメントに画像をアップロードします`);
+        func_1.debugPrint(`      コメントに画像をアップロードします`);
         for (const url of images) {
             const filePath = q ? q.filePath(url) : `${dir}${url}`;
             const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
@@ -73,7 +74,7 @@ class Comment {
                 });
             }
             catch (e) {
-                console.log(`      ${fileName}のアップロードをスキップしました`);
+                func_1.debugPrint(`      ${fileName}のアップロードをスキップしました`);
             }
         }
         urls.forEach(params => {

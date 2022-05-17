@@ -32,6 +32,7 @@ const util_1 = require("util");
 const jsdom_1 = require("jsdom");
 const turndown_1 = __importDefault(require("turndown"));
 const turndownPluginGfm = __importStar(require("turndown-plugin-gfm"));
+const func_1 = require("./func");
 const tables = turndownPluginGfm.tables;
 const turndown = new turndown_1.default();
 turndown.use(tables);
@@ -99,14 +100,14 @@ const generatePage = async (dir, config, note, ary, folder) => {
         let f;
         if (params.child.length > 0) {
             // フォルダを作る
-            console.log(`フォルダを作成します ${params.name}`);
+            func_1.debugPrint(`フォルダを作成します ${params.name}`);
             f = new note_pm_1.Folder({
                 parent_folder_id: folder ? folder.folder_id : null,
                 name: params.name,
             });
             await f.save(note);
         }
-        console.log(`ページを作成します ${params.name}`);
+        func_1.debugPrint(`ページを作成します ${params.name}`);
         const page = new note_pm_1.Page({
             note_code: note.note_code,
             title: params.name,
@@ -118,7 +119,7 @@ const generatePage = async (dir, config, note, ary, folder) => {
         if (u) {
             page.user = u.user_code;
         }
-        console.log(`  作成者は ${page.user} とします`);
+        func_1.debugPrint(`  作成者は ${page.user} とします`);
         await page.save();
         await uploadAttachment(dir, page, params.content);
         if (params.child.length > 0) {
@@ -130,22 +131,22 @@ const uploadAttachment = async (dir, page, body) => {
     const match = body.match(/!\[.*?\]\((.*?)\)/mg);
     page.body = body;
     if (!match) {
-        console.log(`  画像はありません`);
+        func_1.debugPrint(`  画像はありません`);
         await page.save();
         return;
     }
-    console.log(match);
-    console.log(`  画像をアップロードします`);
+    func_1.debugPrint(match);
+    func_1.debugPrint(`  画像をアップロードします`);
     for (const source of match) {
         const src = source.replace(/!\[.*?\]\(/, '').replace(/\)$/, '').replace(/\?.*$/, '');
         const localFileName = path_1.default.basename(src);
-        console.log(`    ファイル名 ${localFileName}`);
+        func_1.debugPrint(`    ファイル名 ${localFileName}`);
         const localPath = `${dir}${src}`;
         const attachment = await note_pm_1.Attachment.add(page, localFileName, localPath);
         const url = attachment.download_url.replace(/https:\/\/(.*?)\.notepm\.jp\/api\/v1\/attachments\/download\//, "https://$1.notepm.jp/private/");
         page.body = page.body.replace(src, url);
     }
-    console.log(`  画像アップロード完了しました`);
+    func_1.debugPrint(`  画像アップロード完了しました`);
     await page.save();
 };
 (async (options) => {

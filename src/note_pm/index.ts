@@ -7,6 +7,7 @@ import fetch from 'node-fetch-with-proxy';
 import User from './user';
 import Attachment from './attachment';
 import Comment from './comment';
+import { debugPrint } from '../func';
 
 const sleep = (msec: number) => new Promise(resolve => setTimeout(resolve, msec));
 
@@ -36,9 +37,9 @@ class NotePM {
   }
 
   async getTags(): Promise<void> {
-    console.log(`  NotePMからタグを取得します`);
+    debugPrint(`  NotePMからタグを取得します`);
     this.tags = await Tag.fetchAll();
-    console.log(`  NotePMよりタグを取得しました`);
+    debugPrint(`  NotePMよりタグを取得しました`);
   }
 
   findUser(name: string): string | null {

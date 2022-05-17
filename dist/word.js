@@ -29,6 +29,7 @@ const fs_1 = __importDefault(require("fs"));
 const note_pm_1 = __importStar(require("./note_pm/"));
 const util_1 = require("util");
 const mammoth_1 = __importDefault(require("mammoth"));
+const func_1 = require("./func");
 const dir = process.argv[process.argv.length - 1];
 commander_1.program
     .version('0.0.1')
@@ -46,7 +47,7 @@ const options = commander_1.program.opts();
     catch (e) {
         await util_1.promisify(fs_1.default.mkdir)(`${dir}images`);
     }
-    console.log('ノート「インポート」を作成します');
+    func_1.debugPrint('ノート「インポート」を作成します');
     const note = new note_pm_1.Note({
         name: 'インポート',
         description: 'フォルダからインポートしたノート',
@@ -62,12 +63,12 @@ const options = commander_1.program.opts();
         if (file.isDirectory())
             continue;
         if (!filePath.match(/\.docx$/)) {
-            console.log(`docx以外のファイル形式には対応していません。スキップします ${filePath}`);
+            func_1.debugPrint(`docx以外のファイル形式には対応していません。スキップします ${filePath}`);
             continue;
         }
         const word = await mammoth_1.default.convertToMarkdown({ path: dirPath });
         const basename = path_1.default.basename(filePath).normalize('NFC');
-        console.log(`Wordファイル ${basename} を処理します`);
+        func_1.debugPrint(`Wordファイル ${basename} を処理します`);
         const title = basename.match(/.*\..*$/) ? basename.replace(/(.*)\..*$/, "$1") : basename;
         const page = new note_pm_1.Page({
             note_code: note.note_code,
@@ -76,17 +77,17 @@ const options = commander_1.program.opts();
             memo: ''
         });
         await page.save();
-        console.log(`ページ ${title} を作成しました`);
+        func_1.debugPrint(`ページ ${title} を作成しました`);
         const match = word.value.match(/!\[.*?\]\((.*?)\)/sg);
         if (match) {
-            console.log(`  画像を処理します`);
+            func_1.debugPrint(`  画像を処理します`);
             for (const source of match) {
                 const src = source.replace(/!\[.*?\]\(/, '').replace(/\)$/, '');
                 const type = src.split(',')[0].replace(/data:(.*);.*/, "$1");
                 const ext = type.split('/')[1];
                 const data = src.split(',')[1];
                 const localFileName = `${(new Date).getTime()}.${ext}`;
-                console.log(`  画像 ${localFileName} をアップロードします`);
+                func_1.debugPrint(`  画像 ${localFileName} をアップロードします`);
                 const localPath = `${dir}images/${localFileName}`;
                 await util_1.promisify(fs_1.default.writeFile)(localPath, data, 'base64');
                 const attachment = await note_pm_1.Attachment.add(page, localFileName, localPath);
@@ -95,7 +96,7 @@ const options = commander_1.program.opts();
                 await util_1.promisify(fs_1.default.unlink)(localPath);
             }
         }
-        console.log(`  ページ本文を更新します`);
+        func_1.debugPrint(`  ページ本文を更新します`);
         page.body = word.value;
         await page.save();
     }

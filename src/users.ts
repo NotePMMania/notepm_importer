@@ -7,6 +7,7 @@ import NotePM, {Note, Folder, Page, Tag, User} from './note_pm';
 import Attachment from './note_pm/attachment';
 import { fstat } from 'fs';
 import { promisify } from 'util';
+import { debugPrint } from './func';
 
 const dir = process.argv[process.argv.length - 1];
 

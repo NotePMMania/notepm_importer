@@ -31,6 +31,7 @@ const util_1 = require("util");
 const jsdom_1 = require("jsdom");
 const turndown_1 = __importDefault(require("turndown"));
 const turndownPluginGfm = __importStar(require("turndown-plugin-gfm"));
+const func_1 = require("./func");
 const tables = turndownPluginGfm.tables;
 const turndown = new turndown_1.default();
 turndown.use(tables);
@@ -120,7 +121,7 @@ const generatePage = async (dir, config, note, ary, folder) => {
         if (params.child) {
             // フォルダを作る
             const folderName = getFolderName(params.name, ary);
-            console.log(`フォルダを作成します ${folderName}`);
+            func_1.debugPrint(`フォルダを作成します ${folderName}`);
             f = new note_pm_1.Folder({
                 parent_folder_id: folder ? folder.folder_id : null,
                 name: folderName,
@@ -129,7 +130,7 @@ const generatePage = async (dir, config, note, ary, folder) => {
             generatePage(`${dir}${params.name}/`, config, note, params.child, f);
         }
         else {
-            console.log(`ページを作成します ${params.name}`);
+            func_1.debugPrint(`ページを作成します ${params.name}`);
             const page = new note_pm_1.Page({
                 note_code: note.note_code,
                 title: params.name,
@@ -141,23 +142,23 @@ const generatePage = async (dir, config, note, ary, folder) => {
             await uploadAttachment(dir, page, params.content);
             // 単純な添付ファイル
             if (params.attachments.length > 0) {
-                console.log(`  添付ファイルを${params.name}にアップロードします`);
+                func_1.debugPrint(`  添付ファイルを${params.name}にアップロードします`);
                 for (const attachment of params.attachments) {
                     const name = decodeURIComponent(attachment.path);
-                    console.log(`    添付ファイル（${name}）をアップロードします`);
+                    func_1.debugPrint(`    添付ファイル（${name}）をアップロードします`);
                     const localPath = `${dir}${name}`;
                     try {
                         await note_pm_1.Attachment.add(page, name, localPath);
-                        console.log(`    添付ファイル（${name}）をアップロードしました`);
+                        func_1.debugPrint(`    添付ファイル（${name}）をアップロードしました`);
                     }
                     catch (e) {
-                        console.log(`    添付ファイル（${name}）をアップロードできませんでした`);
+                        func_1.debugPrint(`    添付ファイル（${name}）をアップロードできませんでした`);
                     }
                 }
-                console.log('  添付ファイルをアップロードしました');
+                func_1.debugPrint('  添付ファイルをアップロードしました');
             }
             if (params.comments.length > 0) {
-                console.log(`  ${params.name}にコメントを投稿します`);
+                func_1.debugPrint(`  ${params.name}にコメントを投稿します`);
                 for (const c of params.comments) {
                     const comment = new note_pm_1.Comment({
                         page_code: page.page_code,
@@ -167,13 +168,13 @@ const generatePage = async (dir, config, note, ary, folder) => {
                     });
                     try {
                         await comment.save();
-                        console.log(`    コメントを投稿しました`);
+                        func_1.debugPrint(`    コメントを投稿しました`);
                     }
                     catch (e) {
-                        console.log(`    コメントの投稿に失敗しました ${e.message}`);
+                        func_1.debugPrint(`    コメントの投稿に失敗しました ${e.message}`);
                     }
                 }
-                console.log(`  ${params.name}にコメントを投稿しました`);
+                func_1.debugPrint(`  ${params.name}にコメントを投稿しました`);
             }
         }
     }
@@ -190,16 +191,16 @@ const uploadAttachment = async (dir, page, body) => {
     }
     page.body = body;
     if (images.length > 0) {
-        console.log(`  画像をアップロードします`);
+        func_1.debugPrint(`  画像をアップロードします`);
         for (const source of images) {
-            console.log(`    ファイル名 ${source}`);
+            func_1.debugPrint(`    ファイル名 ${source}`);
             const localPath = `${dir}${source}`;
             const attachment = await note_pm_1.Attachment.add(page, source, localPath);
             const url = attachment.download_url.replace(/https:\/\/(.*?)\.notepm\.jp\/api\/v1\/attachments\/download\//, "https://$1.notepm.jp/private/");
             const r = new RegExp(source, 'g');
             page.body = page.body.replace(r, url);
         }
-        console.log(`  画像アップロード完了しました`);
+        func_1.debugPrint(`  画像アップロード完了しました`);
     }
     await page.save();
 };
@@ -236,7 +237,7 @@ const uploadAttachment = async (dir, page, body) => {
     }
     catch (e) {
         // エラー
-        console.log('エラーが出たのでノートを削除します');
+        func_1.debugPrint('エラーが出たのでノートを削除します');
         await note.delete();
     }
 })(options);

@@ -7,6 +7,7 @@ import Article from './article';
 import Group from './group';
 import Project from './project';
 import axios from 'axios';
+import { debugPrint } from '../func';
 
 class QiitaTeam {
   public qiitaToken = '';
@@ -55,7 +56,7 @@ class QiitaTeam {
 
       return true;
     } catch (e) {
-      console.log(e);
+      debugPrint(e);
       return false;
     }
   }
@@ -156,7 +157,7 @@ class QiitaTeam {
       p.push(this.download(file));
     };
     await Promise.all(p);
-    console.log(`添付ファイルのダウンロードが完了しました`);
+    debugPrint(`添付ファイルのダウンロードが完了しました`);
   }
   /*
   async open() {
@@ -183,7 +184,7 @@ class QiitaTeam {
       p.push(this.download(image));
     }
     await Promise.all(p);
-    console.log(`画像のダウンロードが完了しました`);
+    debugPrint(`画像のダウンロードが完了しました`);
   }
   /*
   close() {
@@ -213,13 +214,13 @@ class QiitaTeam {
       const buffer = await this.getBinary(url);
       await promisify(fs.writeFile)(filePath, Buffer.from(buffer.data));
     } catch (e) {
-      console.log(`  ダウンロード失敗しました ${url}`);
+      debugPrint(`  ダウンロード失敗しました ${url}`);
     }
     return true;
   }
 
   async getBinary(url: string): Promise<Buffer> {
-    console.log(`  ダウンロードするURL： ${url}`);
+    debugPrint(`  ダウンロードするURL： ${url}`);
     const headers = {};
     if (url.match(/https?:\/\/.*?\.qiita\.com\//)) {
       headers['Authorization'] = `Bearer ${this.qiitaToken}`;

@@ -29,6 +29,7 @@ const js_yaml_1 = __importDefault(require("js-yaml"));
 const note_pm_1 = __importStar(require("./note_pm/"));
 const util_1 = require("util");
 const index_1 = __importDefault(require("./docbase/index"));
+const func_1 = require("./func");
 const dir = process.argv[process.argv.length - 1];
 commander_1.program
     .version('0.0.1')
@@ -75,11 +76,11 @@ const options = commander_1.program.opts();
     const tags = [];
     for (const fileName in d.contents) {
         const file = d.contents[fileName];
-        console.log(`    タグ作成開始`);
+        func_1.debugPrint(`    タグ作成開始`);
         for (const tag of file.tags) {
             if (tags.indexOf(tag.name) > -1)
                 continue;
-            console.log(`      タグ： ${tag.name}`);
+            func_1.debugPrint(`      タグ： ${tag.name}`);
             const t = new note_pm_1.Tag({
                 name: tag.name,
             });
@@ -89,7 +90,7 @@ const options = commander_1.program.opts();
             catch (e) {
             }
         }
-        console.log(`    タグ保存完了`);
+        func_1.debugPrint(`    タグ保存完了`);
         // 該当するノートを抽出
         if (file.groups.length === 0)
             file.groups.push({ name: 'ルート' });
@@ -97,9 +98,9 @@ const options = commander_1.program.opts();
             const note = notes[group.name];
             const body = file.body;
             const title = file.title;
-            console.log('');
-            console.log(`    タイトル： ${title}`);
-            console.log(`    ノート： ${group.name} => ${note.name}`);
+            func_1.debugPrint('');
+            func_1.debugPrint(`    タイトル： ${title}`);
+            func_1.debugPrint(`    ノート： ${group.name} => ${note.name}`);
             const page = new note_pm_1.Page({
                 title,
                 body,
@@ -111,7 +112,7 @@ const options = commander_1.program.opts();
             page.user = file.user.name;
             await page.save();
             await page.updateImageBody(null, `${d.dir}/attachments/`);
-            console.log(`    ページID： ${page.page_code}`);
+            func_1.debugPrint(`    ページID： ${page.page_code}`);
             // コメント投稿
             if (file.comments) {
                 for (const c of file.comments) {

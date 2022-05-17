@@ -3,6 +3,7 @@ import Attachment from './attachment';
 import Page from './page';
 import QiitaTeam from '../qiita/index';
 import dayjs from 'dayjs';
+import { debugPrint } from '../func';
 
 class Comment {
   static NotePM: NotePM;
@@ -66,7 +67,7 @@ class Comment {
   async updateImageBody(q: QiitaTeam | null, page: Page, dir = ''): Promise<void> {
     const images = this.images();
     const urls: notePM_UploadImage[] = [];
-    console.log(`      コメントに画像をアップロードします`);
+    debugPrint(`      コメントに画像をアップロードします`);
     for (const url of images) {
       const filePath = q ? q.filePath(url) : `${dir}${url}`;
       const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
@@ -77,7 +78,7 @@ class Comment {
           download_url: `https://${Page.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
         });
       } catch (e) {
-        console.log(`      ${fileName}のアップロードをスキップしました`);
+        debugPrint(`      ${fileName}のアップロードをスキップしました`);
       }
     }
     urls.forEach(params => {

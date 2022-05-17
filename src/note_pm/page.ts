@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import QiitaTeam from '../qiita/index';
 import Attachment from './attachment';
 import dayjs from 'dayjs';
+import { debugPrint } from '../func';
 
 class Page {
   static NotePM: NotePM;
@@ -125,7 +126,7 @@ class Page {
     for (const url of images) {
       const filePath = q ? q.filePath(url) : `${dir}${url}`;
       const fileName = url.replace(/^.*\/(.*)(\?|$)/, "$1");
-      console.log(`    ${this.title}に画像をアップロードします。 ${fileName}`);
+      debugPrint(`    ${this.title}に画像をアップロードします。 ${fileName}`);
       try {
         const attachment = await Attachment.add(this, fileName, filePath);
         urls.push({
@@ -133,14 +134,14 @@ class Page {
           download_url: `https://${Page.NotePM.domain}.notepm.jp/private/${attachment.file_id}?ref=thumb`
         });
       } catch (e) {
-        console.log(`      アップロードをスキップしました。 ${fileName}`);
+        debugPrint(`      アップロードをスキップしました。 ${fileName}`);
       }
     }
     urls.forEach(params => {
       const r = new RegExp(params.url, 'gs');
       this.body = this.body.replace(r, params.download_url);
     });
-    console.log(`    ${this.title}を更新します`);
+    debugPrint(`    ${this.title}を更新します`);
     await this.save();
   }
 }

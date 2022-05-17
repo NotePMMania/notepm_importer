@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const func_1 = require("../func");
 class Folder {
     constructor(params) {
         this.folder_id = 0;
@@ -33,7 +34,7 @@ class Folder {
         return params ? new Folder(params) : undefined;
     }
     async create(note) {
-        console.log(`フォルダを作成します : ${this.name}`);
+        func_1.debugPrint(`フォルダを作成します : ${this.name}`);
         const response = await Folder.NotePM.fetch('POST', `/notes/${note.note_code}/folders`, {
             name: this.name,
             parent_folder_id: this.parent_folder_id

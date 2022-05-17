@@ -4,6 +4,7 @@ import fs from 'fs';
 import { promisify } from 'util';
 import crypto from 'crypto';
 import parseMD from 'parse-md';
+import { debugPrint } from '../func';
 
 class Esa {
   public domain = '';
@@ -125,7 +126,7 @@ class Esa {
 
       return true;
     } catch (e) {
-      console.log(e);
+      debugPrint(e);
       return false;
     }
   }

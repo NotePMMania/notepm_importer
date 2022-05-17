@@ -20,6 +20,7 @@ const attachment_1 = __importDefault(require("./attachment"));
 exports.Attachment = attachment_1.default;
 const comment_1 = __importDefault(require("./comment"));
 exports.Comment = comment_1.default;
+const func_1 = require("../func");
 const sleep = (msec) => new Promise(resolve => setTimeout(resolve, msec));
 class NotePM {
     constructor(accessToken, domain) {
@@ -43,9 +44,9 @@ class NotePM {
         this.users = await user_1.default.fetchAll();
     }
     async getTags() {
-        console.log(`  NotePMからタグを取得します`);
+        func_1.debugPrint(`  NotePMからタグを取得します`);
         this.tags = await tag_1.default.fetchAll();
-        console.log(`  NotePMよりタグを取得しました`);
+        func_1.debugPrint(`  NotePMよりタグを取得しました`);
     }
     findUser(name) {
         const user = this.users.filter(u => u.name === name || u.user_code === name)[0];

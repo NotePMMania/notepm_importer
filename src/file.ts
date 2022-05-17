@@ -4,6 +4,7 @@ import path from 'path';
 import fs from 'fs';
 import NotePM, {Note, Folder, Page, Tag, Comment, Attachment, User} from './note_pm/';
 import { promisify } from 'util';
+import { debugPrint } from './func';
 
 // import FileDir from './file/index';
 
@@ -35,12 +36,12 @@ const importExecute = async (note: Note, folder: Folder, dir: string) => {
       try {
         await f.save(note);
         if (folder) {
-          console.log(`  フォルダ ${folder.name} の下にフォルダ ${f.name} を作成しました`);
+          debugPrint(`  フォルダ ${folder.name} の下にフォルダ ${f.name} を作成しました`);
         }
         await importExecute(note, f, dirPath);
       } catch (e) {
-        console.log(`  フォルダ ${folder.name} の下にフォルダ ${f.name} を作成しようとしてエラーが発生しました`);
-        console.log(`  ${e.message}`);
+        debugPrint(`  フォルダ ${folder.name} の下にフォルダ ${f.name} を作成しようとしてエラーが発生しました`);
+        debugPrint(`  ${e.message}`);
         process.exit(1);
       }
     } else {
@@ -55,9 +56,9 @@ const importExecute = async (note: Note, folder: Folder, dir: string) => {
       });
       await page.save();
       if (folder) {
-        console.log(`  フォルダ ${folder.name} の下にページ ${page.title} を作成しました ${folder.folder_id}`);
+        debugPrint(`  フォルダ ${folder.name} の下にページ ${page.title} を作成しました ${folder.folder_id}`);
       } else {
-        console.log(`  ノート ${note.name} の下にページ ${page.title} を作成しました`);
+        debugPrint(`  ノート ${note.name} の下にページ ${page.title} を作成しました`);
       }
       // ファイルアップロード
       const attachment = await Attachment.add(page, basename, dirPath);

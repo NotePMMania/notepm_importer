@@ -9,6 +9,7 @@ import Attachment from './note_pm/attachment';
 import { fstat } from 'fs';
 import { promisify } from 'util';
 import User from './note_pm/user';
+import { debugPrint } from './func';
 
 const dir = process.argv[process.argv.length - 1];
 
@@ -64,82 +65,82 @@ const executeProject = async (q: QiitaTeam) => {
 const sleep = (ms: number) => new Promise(res => setTimeout(res, ms));
 
 const prepareTag = async (n: NotePM, q: QiitaTeam) => {
-  console.log(`  タグを取得します`);
+  debugPrint(`  タグを取得します`);
   try {
     await n.getTags();
   } catch (e) {
-    console.log(`  タグの取得に失敗しました。終了します。`);
+    debugPrint(`  タグの取得に失敗しました。終了します。`);
     process.exit(1);
   }
-  console.log(`  Qiita記事からのタグを取得します`);
+  debugPrint(`  Qiita記事からのタグを取得します`);
   const names =  Array.from(new Set(q.articles.map(a => a.tags?.map(a => a.name)).flat()));
-  console.log(`  Qiita記事から${names.length}件のタグを取得しました`);
+  debugPrint(`  Qiita記事から${names.length}件のタグを取得しました`);
   const tagNames: string[] = [];
-  console.log(`  未設定のタグがあるか確認します`);
+  debugPrint(`  未設定のタグがあるか確認します`);
   names.forEach(t => {
     const bol = n.tags.filter(tag => tag.name == t)[0];
     if (!bol) {
       tagNames.push(t!);
     }
   });
-  console.log(`  未設定のタグは${tagNames.length}件です`);
+  debugPrint(`  未設定のタグは${tagNames.length}件です`);
   if (tagNames.length === 0) return;
   const tags: Tag[] = [];
   for (const name of tagNames) {
-    console.log(`    タグ${name}を作成します`);
+    debugPrint(`    タグ${name}を作成します`);
     const t = new Tag({
       name: name!
     });
     await t.save();
-    console.log(`    タグ${name}を作成しました`);
+    debugPrint(`    タグ${name}を作成しました`);
     sleep(500);
     tags.push(t);
   }
   tags.forEach(t => n.tags.push(t));
-  console.log(`  タグの準備完了です`);
+  debugPrint(`  タグの準備完了です`);
 }
 
 (async (options) => {
   // if (!options.domain || !options.domain.match(/.*\.qiita\.com/) ) throw new Error('Qiitaのドメインが指定されていない、または qiita.com で終わっていません');
   if (!options.path) {
-    console.log(`取り込み対象のディレクトリが指定されていません（-p または --path）`);
+    debugPrint(`取り込み対象のディレクトリが指定されていません（-p または --path）`);
     process.exit(1);
   }
   if (!options.qiita) {
-    console.log(`Qiita Teamのアクセストークンが指定されていません（-q または --qiita）`);
+    debugPrint(`Qiita Teamのアクセストークンが指定されていません（-q または --qiita）`);
     process.exit(1);
   }
   if (!options.accessToken) {
-    console.log(`NotePMのアクセストークンが指定されていません（-a または --access-token）`);
+    debugPrint(`NotePMのアクセストークンが指定されていません（-a または --access-token）`);
     process.exit(1);
   }
   if (!options.team) {
-    console.log(`NotePMのドメインが指定されていません（-t または --team）`);
+    debugPrint(`NotePMのドメインが指定されていません（-t または --team）`);
     process.exit(1);
   }
   if (!options.userYaml) {
-    console.log(`ユーザー設定用YAMLファイルが指定されていません（-u または --user-yaml）`);
+    debugPrint(`ユーザー設定用YAMLファイルが指定されていません（-u または --user-yaml）`);
     process.exit(1);
   }
-  console.log(`取り込み対象ディレクトリ： ${options.path}`);
-  console.log(`Qiita Teamへのアクセストークン： ${options.qiita}`);
-  console.log(`NotePMのアクセストークン： ${options.accessToken}`);
-  console.log(`NotePMのドメイン： ${options.team}.notepm.jp`);
-  console.log(`ユーザー設定用YAMLファイル： ${options.userYaml}`);
+  debugPrint(`取り込み対象ディレクトリ： ${options.path}`);
+  debugPrint(`Qiita Teamへのアクセストークン： ${options.qiita}`);
+  debugPrint(`NotePMのアクセストークン： ${options.accessToken}`);
+  debugPrint(`NotePMのドメイン： ${options.team}.notepm.jp`);
+  debugPrint(`ユーザー設定用YAMLファイル： ${options.userYaml}`);
   const str = await promisify(fs.readFile)(options.userYaml, 'utf-8');
   const config = await yaml.load(str) as Config;
   const q = new QiitaTeam(options.path, options.qiita);
   const n = new NotePM(options.accessToken, options.team);
   await q.load();
   // ブラウザを立ち上げて画像をダウンロード
-  // console.log('ブラウザを立ち上げます。Qiita Teamへログインしてください');
+  // debugPrint('ブラウザを立ち上げます。Qiita Teamへログインしてください');
   // await q.open();
-  console.log('画像をダウンロードします');
+  debugPrint('画像をダウンロードします');
   await q.downloadImage();
   await q.downloadAttachment();
   // await q.close();
-  console.log('画像をダウンロードしました');
-  console.log('ユーザ一覧を読み込みます');
+  debugPrint('画像をダウンロードしました');
+  debugPrint('ユーザ一覧を読み込みます');
   await n.getUsers();
   config.users.forEach(u => {
     n.users.push(new User({
@@ -147,19 +148,19 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
       name: u.id,
     }));  
   });
-  console.log('ユーザ一覧の読み込み完了');
+  debugPrint('ユーザ一覧の読み込み完了');
 
   // タグを準備
-  console.log('タグを準備します');
+  debugPrint('タグを準備します');
   await prepareTag(n, q);
-  console.log('グループがない記事を取り込む用のノートを準備します');
+  debugPrint('グループがない記事を取り込む用のノートを準備します');
   const baseNote = await createImportNote();
   // プロジェクト記事の取り込み
-  console.log('プロジェクト記事をインポートします');
+  debugPrint('プロジェクト記事をインポートします');
   if (q.projects) executeProject(q);
 
   // グループごとにノートを作成
-  console.log('グループのノートを作成します');
+  debugPrint('グループのノートを作成します');
   const groups: Note[] = [];
   for (const g of q.groups) {
     const note = new Note({
@@ -173,14 +174,14 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
         note.users?.push(user!);
       }
     });
-    console.log(`  ${g.name}を作成します`);
+    debugPrint(`  ${g.name}を作成します`);
     await note.save();
-    console.log(`  ${g.name}を作成しました`);
+    debugPrint(`  ${g.name}を作成しました`);
     groups.push(note);
   }
-  console.log('グループのノートを作成しました');
+  debugPrint('グループのノートを作成しました');
 
-  console.log('ページを作成します');
+  debugPrint('ページを作成します');
   for (const a of q.articles) {
     const page = new Page({
       title: a.title,
@@ -188,36 +189,36 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
       created_at: new Date(a.created_at),
       memo: 'Qiita::Teamからインポートしました',
     });
-    console.log(`  タイトル：${page.title} `);
+    debugPrint(`  タイトル：${page.title} `);
     if (a.group) {
       page.note_code = groups.filter(g => g.name === a.group?.name)[0].note_code;
     } else {
       page.note_code = baseNote.note_code;
     }
-    console.log(`    ノートコードは${page.note_code}になります`);
+    debugPrint(`    ノートコードは${page.note_code}になります`);
     if (a.tags) {
       a.tags.forEach(t => page.tags?.push(t.name));
     }
     if (a.user) {
       page.user = a.user.id;
     }
-    console.log(`    ノートを保存します`);
+    debugPrint(`    ノートを保存します`);
     await page.save();
-    console.log(`    ノートを保存しました ${page.page_code}`);
+    debugPrint(`    ノートを保存しました ${page.page_code}`);
     if (page.hasImage()) {
-      console.log(`    画像があります。ページ内容を更新します`);
+      debugPrint(`    画像があります。ページ内容を更新します`);
       await page.updateImageBody(q);
-      console.log(`    画像のURLに合わせてページ内容を更新しました`);
+      debugPrint(`    画像のURLに合わせてページ内容を更新しました`);
     }
 
     // コメントの反映
     if (a.comments?.length! > 0) {
       if (!page.page_code) {
-        // console.error(`データがありません： ${JSON.stringify(a)}`);
-        console.log(`データがありません ${page.title} : ${a.title}`);
+        // debugPrint(`データがありません： ${JSON.stringify(a)}`);
+        debugPrint(`データがありません ${page.title} : ${a.title}`);
         return;
       }
-      console.log(`  コメントが${a.comments?.length}件あります（ページコード： ${page.page_code}） ${page.title}`);
+      debugPrint(`  コメントが${a.comments?.length}件あります（ページコード： ${page.page_code}） ${page.title}`);
       for (const c of a.comments!) {
         const comment = new Comment({
           page_code: page.page_code!,
@@ -225,16 +226,16 @@ const prepareTag = async (n: NotePM, q: QiitaTeam) => {
           user: c.user?.id,
           body: c.body
         });
-        console.log(`  コメントを保存します`);
+        debugPrint(`  コメントを保存します`);
         await comment.save();
         if (comment.images().length > 0) {
-          console.log(`  コメントに画像があります。内容を更新します`);
+          debugPrint(`  コメントに画像があります。内容を更新します`);
           await comment.updateImageBody(q, page);
         }
       };
     }
   }
-  console.log('インポート終了しました');
+  debugPrint('インポート終了しました');
 })(options);
 
 

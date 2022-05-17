@@ -12,6 +12,7 @@ const article_1 = __importDefault(require("./article"));
 const group_1 = __importDefault(require("./group"));
 const project_1 = __importDefault(require("./project"));
 const axios_1 = __importDefault(require("axios"));
+const func_1 = require("../func");
 class QiitaTeam {
     // public page: puppeteer.Page | null = null;
     // public browser: puppeteer.Browser | null = null;
@@ -55,7 +56,7 @@ class QiitaTeam {
   
         return true;
       } catch (e) {
-        console.log(e);
+        debugPrint(e);
         return false;
       }
     }
@@ -144,7 +145,7 @@ class QiitaTeam {
         }
         ;
         await Promise.all(p);
-        console.log(`添付ファイルのダウンロードが完了しました`);
+        func_1.debugPrint(`添付ファイルのダウンロードが完了しました`);
     }
     /*
     async open() {
@@ -170,7 +171,7 @@ class QiitaTeam {
             p.push(this.download(image));
         }
         await Promise.all(p);
-        console.log(`画像のダウンロードが完了しました`);
+        func_1.debugPrint(`画像のダウンロードが完了しました`);
     }
     /*
     close() {
@@ -199,12 +200,12 @@ class QiitaTeam {
             await util_1.promisify(fs_1.default.writeFile)(filePath, Buffer.from(buffer.data));
         }
         catch (e) {
-            console.log(`  ダウンロード失敗しました ${url}`);
+            func_1.debugPrint(`  ダウンロード失敗しました ${url}`);
         }
         return true;
     }
     async getBinary(url) {
-        console.log(`  ダウンロードするURL： ${url}`);
+        func_1.debugPrint(`  ダウンロードするURL： ${url}`);
         const headers = {};
         if (url.match(/https?:\/\/.*?\.qiita\.com\//)) {
             headers['Authorization'] = `Bearer ${this.qiitaToken}`;

@@ -8,6 +8,7 @@ import { promisify } from 'util';
 import { JSDOM } from 'jsdom';
 import TurndownService from 'turndown';
 import * as turndownPluginGfm from 'turndown-plugin-gfm';
+import { debugPrint } from './func';
 const tables = turndownPluginGfm.tables
 const turndown = new TurndownService();
 turndown.use(tables);
@@ -98,7 +99,7 @@ const generatePage = async (dir: string, config, note: Note, ary: any[], folder?
     if (params.child) {
       // フォルダを作る
       const folderName = getFolderName(params.name, ary);
-      console.log(`フォルダを作成します ${folderName}`);
+      debugPrint(`フォルダを作成します ${folderName}`);
       f = new Folder({
         parent_folder_id: folder ? folder.folder_id : null,
         name: folderName,
@@ -106,7 +107,7 @@ const generatePage = async (dir: string, config, note: Note, ary: any[], folder?
       await f.save(note);
       generatePage(`${dir}${params.name}/`, config, note, params.child, f);
     } else {
-      console.log(`ページを作成します ${params.name}`);
+      debugPrint(`ページを作成します ${params.name}`);
       const page = new Page({
         note_code: note.note_code,
         title: params.name,
@@ -119,22 +120,22 @@ const generatePage = async (dir: string, config, note: Note, ary: any[], folder?
 
       // 単純な添付ファイル
       if (params.attachments.length > 0) {
-        console.log(`  添付ファイルを${params.name}にアップロードします`);
+        debugPrint(`  添付ファイルを${params.name}にアップロードします`);
         for (const attachment of params.attachments) {
           const name = decodeURIComponent(attachment.path);
-          console.log(`    添付ファイル（${name}）をアップロードします`);
+          debugPrint(`    添付ファイル（${name}）をアップロードします`);
           const localPath = `${dir}${name}`;
           try {
             await Attachment.add(page, name, localPath);
-            console.log(`    添付ファイル（${name}）をアップロードしました`);
+            debugPrint(`    添付ファイル（${name}）をアップロードしました`);
           } catch (e) {
-            console.log(`    添付ファイル（${name}）をアップロードできませんでした`);
+            debugPrint(`    添付ファイル（${name}）をアップロードできませんでした`);
           }
         }
-        console.log('  添付ファイルをアップロードしました');
+        debugPrint('  添付ファイルをアップロードしました');
       }
       if (params.comments.length > 0) {
-        console.log(`  ${params.name}にコメントを投稿します`);
+        debugPrint(`  ${params.name}にコメントを投稿します`);
         for (const c of params.comments) {
           const comment = new Comment({
             page_code: page.page_code!,
@@ -144,12 +145,12 @@ const generatePage = async (dir: string, config, note: Note, ary: any[], folder?
           });
           try {
             await comment.save();
-            console.log(`    コメントを投稿しました`);
+            debugPrint(`    コメントを投稿しました`);
           } catch (e) {
-            console.log(`    コメントの投稿に失敗しました ${e.message}`);
+            debugPrint(`    コメントの投稿に失敗しました ${e.message}`);
           }
         }
-        console.log(`  ${params.name}にコメントを投稿しました`);
+        debugPrint(`  ${params.name}にコメントを投稿しました`);
       }
     }
   }
@@ -168,16 +169,16 @@ const uploadAttachment = async (dir: string, page: Page, body: string) => {
   
   page.body = body;
   if (images.length > 0) {
-    console.log(`  画像をアップロードします`);
+    debugPrint(`  画像をアップロードします`);
     for (const source of images) {
-      console.log(`    ファイル名 ${source}`);
+      debugPrint(`    ファイル名 ${source}`);
       const localPath = `${dir}${source}`;
       const attachment = await Attachment.add(page, source, localPath);
       const url = attachment.download_url.replace(/https:\/\/(.*?)\.notepm\.jp\/api\/v1\/attachments\/download\//, "https://$1.notepm.jp/private/");
       const r = new RegExp(source, 'g');
       page.body = page.body.replace(r, url);
     }
-    console.log(`  画像アップロード完了しました`);
+    debugPrint(`  画像アップロード完了しました`);
   }
   await page.save();
 }
@@ -215,7 +216,7 @@ const uploadAttachment = async (dir: string, page: Page, body: string) => {
     await generatePage(dir, config, note, ary);
   } catch (e) {
     // エラー
-    console.log('エラーが出たのでノートを削除します')
+    debugPrint('エラーが出たのでノートを削除します')
     await note.delete();
   }
 })(options);

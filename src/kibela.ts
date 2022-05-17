@@ -7,6 +7,7 @@ import NotePM, {Note, Folder, Page, Tag, Comment, Attachment, User} from './note
 import { promisify } from 'util';
 import Kibela from './kibela/index';
 import { exit } from 'process';
+import { debugPrint } from './func';
 
 const dir = process.argv[process.argv.length - 1];
 
@@ -33,9 +34,9 @@ const findOrCreateFolder = async (note: Note, folders: Kibela_Folder[], paths: s
       parent_folder_id: parentFolder ? parentFolder.folder_id : null,
       note_code: note.note_code,
     });
-    console.log(`　　存在しないフォルダを作成します`);
-    console.log(`　　ノート： ${note.name}`);
-    console.log(`　　フォルダ名： ${paths[0]}`);
+    debugPrint(`　　存在しないフォルダを作成します`);
+    debugPrint(`　　ノート： ${note.name}`);
+    debugPrint(`　　フォルダ名： ${paths[0]}`);
     await n.save(note);
     folder = {
       folder: n,
@@ -97,20 +98,20 @@ const findOrCreateFolder = async (note: Note, folders: Kibela_Folder[], paths: s
           }
         }
       } else {
-        console.log('メタデータにフォルダ情報がありません。このファイルは取り込めません');
-        console.log('=======以下デバッグ情報です=======')
-        console.log(file.metadata);
-        console.log('=======以上デバッグ情報です=======')
+        debugPrint('メタデータにフォルダ情報がありません。このファイルは取り込めません');
+        debugPrint('=======以下デバッグ情報です=======')
+        debugPrint(file.metadata);
+        debugPrint('=======以上デバッグ情報です=======')
         throw new Error('Unknown error');
       }
       const ary = file.content.split(/\n/);
       const body = ary.slice(3).join("\n");
       const title = ary.filter(s => s !== '')[0].replace(/^# /, '');
-      console.log('');
-      console.log(`　　タイトル： ${title}`);
-      console.log(`　　ノート： ${group} => ${note.name}`);
-      console.log(`　　フォルダ： ${file.metadata.folders} => ${folder ? folder.name : 'なし'}, (${folder ? folder.folder_id : ''})`);
-      console.log(`    作成日： ${file.metadata.published_at}`);
+      debugPrint('');
+      debugPrint(`　　タイトル： ${title}`);
+      debugPrint(`　　ノート： ${group} => ${note.name}`);
+      debugPrint(`　　フォルダ： ${file.metadata.folders} => ${folder ? folder.name : 'なし'}, (${folder ? folder.folder_id : ''})`);
+      debugPrint(`    作成日： ${file.metadata.published_at}`);
       const page = new Page({
         title,
         body,

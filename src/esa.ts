@@ -4,6 +4,7 @@ import path from 'path';
 import NotePM, {Note, Folder, Page, Tag, Comment, Attachment, User} from './note_pm/';
 import { promisify } from 'util';
 import Esa from './esa/index';
+import { debugPrint } from './func';
 
 const dir = process.argv[process.argv.length - 1];
 
@@ -50,8 +51,8 @@ const prepareFolder = async(note: Note, dirs: Esa_Dir[], parentFolder?: Folder) 
     try {
       await folder.save(note);
     } catch (e) {
-      console.error(`フォルダの作成に失敗しました： ${folder.name}`);
-      console.error(`エラーメッセージ${e.message}`);
+      debugPrint(`フォルダの作成に失敗しました： ${folder.name}`);
+      debugPrint(`エラーメッセージ${e.message}`);
       process.exit(1);
     }
     res.folder = folder;
@@ -92,7 +93,7 @@ const findNoteOrFolder = (dirs, category: string | null) => {
   let tags: string[] = [];
   for (const file in e.files) {
     const params = e.files[file];
-    // console.log(file);
+    // debugPrint(file);
     (params.metadata.tags || '')
       .split(',')
       .map(s => s.trim())
@@ -116,15 +117,15 @@ const findNoteOrFolder = (dirs, category: string | null) => {
   // ページの作成
   for (const file in e.files) {
     const params = e.files[file];
-    // console.log(file);
+    // debugPrint(file);
     const { metadata } = params;
-    console.log(`  ページタイトル： ${metadata.title}`);
-    console.log(`  カテゴリ： ${metadata.category}`);
+    debugPrint(`  ページタイトル： ${metadata.title}`);
+    debugPrint(`  カテゴリ： ${metadata.category}`);
     const { note, folder } = findNoteOrFolder(ary, metadata.category);
-    console.log(`  ノート： ${note.note_code}`);
-    console.log(`  フォルダ： ${folder?.folder_id}`);
+    debugPrint(`  ノート： ${note.note_code}`);
+    debugPrint(`  フォルダ： ${folder?.folder_id}`);
     const tags = (metadata.tags || '').split(',').map(s => s.trim()).filter(s => s !== '').map(s => new Tag({name: s}));
-    console.log(`  タグ： ${tags.map(t => t.name).join(', ')}`);
+    debugPrint(`  タグ： ${tags.map(t => t.name).join(', ')}`);
     const page = new Page({
       title: metadata.title,
       body: params.content,
