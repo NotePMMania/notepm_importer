@@ -108,7 +108,7 @@ const prepareTag = async (n, q) => {
         });
         await t.save();
         func_1.debugPrint(`    タグ${name}を作成しました`);
-        sleep(500);
+        sleep(1000);
         tags.push(t);
     }
     tags.forEach(t => n.tags.push(t));

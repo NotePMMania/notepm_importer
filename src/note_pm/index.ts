@@ -55,26 +55,28 @@ class NotePM {
       headers['Content-Type'] = 'application/json';
     }
     await sleep(1000);
+    const url = `${this.url}${path}`;
+    debugPrint(`${method}: ${url}`);
     if (method === 'GET') {
-      const res = await fetch(`${this.url}${path}`, { headers });
+      const res = await fetch(url, { headers });
       return await res.json();
     }
     if (method === 'POST') {
       if (!(body instanceof FormData)) {
         body = JSON.stringify(body);
       }
-      const res = await fetch(`${this.url}${path}`, { method, headers, body });
+      const res = await fetch(url, { method, headers, body });
       return await res.json();
     }
     if (method === 'PATCH') {
       if (!(body instanceof FormData)) {
         body = JSON.stringify(body);
       }
-      const res = await fetch(`${this.url}${path}`, { method, headers, body });
+      const res = await fetch(url, { method, headers, body });
       return await res.json();
     }
     if (method === 'DELETE') {
-      const res = await fetch(`${this.url}${path}`, { method, headers });
+      const res = await fetch(url, { method, headers });
       const text = await res.text();
       if (text === '') return {};
     }

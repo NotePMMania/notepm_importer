@@ -60,26 +60,28 @@ class NotePM {
             headers['Content-Type'] = 'application/json';
         }
         await sleep(1000);
+        const url = `${this.url}${path}`;
+        func_1.debugPrint(`${method}: ${url}`);
         if (method === 'GET') {
-            const res = await node_fetch_with_proxy_1.default(`${this.url}${path}`, { headers });
+            const res = await node_fetch_with_proxy_1.default(url, { headers });
             return await res.json();
         }
         if (method === 'POST') {
             if (!(body instanceof form_data_1.default)) {
                 body = JSON.stringify(body);
             }
-            const res = await node_fetch_with_proxy_1.default(`${this.url}${path}`, { method, headers, body });
+            const res = await node_fetch_with_proxy_1.default(url, { method, headers, body });
             return await res.json();
         }
         if (method === 'PATCH') {
             if (!(body instanceof form_data_1.default)) {
                 body = JSON.stringify(body);
             }
-            const res = await node_fetch_with_proxy_1.default(`${this.url}${path}`, { method, headers, body });
+            const res = await node_fetch_with_proxy_1.default(url, { method, headers, body });
             return await res.json();
         }
         if (method === 'DELETE') {
-            const res = await node_fetch_with_proxy_1.default(`${this.url}${path}`, { method, headers });
+            const res = await node_fetch_with_proxy_1.default(url, { method, headers });
             const text = await res.text();
             if (text === '')
                 return {};
