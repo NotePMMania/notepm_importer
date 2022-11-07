@@ -19,7 +19,7 @@ class User {
     const res = await User.NotePM.fetch('GET', `/users?page=${page}&per_page=${perPage}`);
     if (res.messages) throw new Error(res.messages.join(', '));
     let users = (res.users as notePM_User[]).map(u => new User(u));
-    if (users.length > perPage) {
+    if (users.length === perPage) {
       const nextUsers = await User.fetchAll(page + 1);
       users = users.concat(nextUsers);
     } else {
