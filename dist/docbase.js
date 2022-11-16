@@ -76,7 +76,7 @@ const options = commander_1.program.opts();
     const tags = [];
     for (const fileName in d.contents) {
         const file = d.contents[fileName];
-        func_1.debugPrint(`    タグ作成開始`);
+        func_1.debugPrint(`    ${fileName}のタグ作成開始`);
         for (const tag of file.tags) {
             if (tags.indexOf(tag.name) > -1)
                 continue;
@@ -86,8 +86,10 @@ const options = commander_1.program.opts();
             });
             try {
                 await t.save();
+                tags.push(tag.name);
             }
             catch (e) {
+                func_1.debugPrint(`      タグの作成に失敗しました。既に存在する可能性があります。 ${JSON.stringify(e)}`);
             }
         }
         func_1.debugPrint(`    タグ保存完了`);
