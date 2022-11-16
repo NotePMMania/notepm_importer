@@ -86,7 +86,7 @@ const options = program.opts();
         body,
         note_code: note.note_code,
         memo: '',
-        tags: file.tags.map(t => t.name).join(','),
+        tags: file.tags.map(t => t.name),
         created_at: new Date(file.created_at)
       });
       page.user = file.user.name;
