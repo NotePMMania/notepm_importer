@@ -42,9 +42,10 @@ class Page {
         }
         if (params.tags) {
             params.tags.forEach(t => {
-                if (this.tags.indexOf(t.name) > -1)
+                const tagName = t.name || t;
+                if (this.tags.indexOf(tagName) > -1)
                     return;
-                this.tags.push(t.name);
+                this.tags.push(tagName);
             });
         }
         if (params.users) {
@@ -64,6 +65,9 @@ class Page {
     }
     async create() {
         const user = Page.NotePM.findUser(this.user);
+        func_1.debugPrint(`      ユーザー： ${user || 'NotePM-bot'}`);
+        func_1.debugPrint(`      タイトル： ${this.title}`);
+        func_1.debugPrint(`      タグ： ${this.tags.join(', ')}`);
         const response = await Page.NotePM.fetch('POST', `/pages`, {
             note_code: this.note_code,
             folder_id: this.folder_id,

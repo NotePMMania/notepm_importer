@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const func_1 = require("../func");
 class Tag {
     constructor(params) {
         this.name = '';
@@ -13,6 +14,7 @@ class Tag {
         }
     }
     async save() {
+        func_1.debugPrint(`      Tag class タグ作成： ${this.name}`);
         const response = await Tag.NotePM.fetch('POST', `/tags`, {
             name: this.name,
         });

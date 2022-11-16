@@ -1,4 +1,5 @@
 import NotePM from './index';
+import { debugPrint } from '../func';
 
 class Tag {
   static NotePM: NotePM;
@@ -17,6 +18,7 @@ class Tag {
   }
 
   async save(): Promise<Tag> {
+    debugPrint(`      Tag class タグ作成： ${this.name}`);
     const response = await Tag.NotePM.fetch('POST', `/tags`, {
       name: this.name,
     });
