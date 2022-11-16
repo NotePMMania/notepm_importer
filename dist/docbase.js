@@ -103,12 +103,13 @@ const options = commander_1.program.opts();
             func_1.debugPrint('');
             func_1.debugPrint(`    タイトル： ${title}`);
             func_1.debugPrint(`    ノート： ${group.name} => ${note.name}`);
+            func_1.debugPrint(`    タグ： ${file.tags.map(t => t.name).join(',')}`);
             const page = new note_pm_1.Page({
                 title,
                 body,
                 note_code: note.note_code,
                 memo: '',
-                tags: file.tags,
+                tags: file.tags.map(t => t.name).join(','),
                 created_at: new Date(file.created_at)
             });
             page.user = file.user.name;

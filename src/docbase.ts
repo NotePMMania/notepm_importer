@@ -80,12 +80,13 @@ const options = program.opts();
       debugPrint('');
       debugPrint(`    タイトル： ${title}`);
       debugPrint(`    ノート： ${group.name} => ${note.name}`);
+      debugPrint(`    タグ： ${file.tags.map(t => t.name).join(',')}`);
       const page = new Page({
         title,
         body,
         note_code: note.note_code,
         memo: '',
-        tags: file.tags,
+        tags: file.tags.map(t => t.name).join(','),
         created_at: new Date(file.created_at)
       });
       page.user = file.user.name;
