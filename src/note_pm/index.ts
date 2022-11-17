@@ -57,6 +57,7 @@ class NotePM {
     await sleep(1000);
     const url = `${this.url}${path}`;
     debugPrint(`${method}: ${url}`);
+    debugPrint(`  body: ${JSON.stringify(body)}`);
     if (method === 'GET') {
       const res = await fetch(url, { headers });
       return await res.json();
