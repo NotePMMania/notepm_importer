@@ -67,7 +67,7 @@ const options = program.opts();
         await t.save();
         tags.push(tag.name);
       } catch (e) {
-        debugPrint(`      タグの作成に失敗しました。既に存在する可能性があります。 ${JSON.stringify(e)}`);
+        debugPrint(`      タグの作成に失敗しました。既に存在する可能性があります。 ${e.message}`);
       }
     }
     debugPrint(`    タグ保存完了`);

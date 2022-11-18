@@ -44,6 +44,7 @@ class NotePM {
 
   findUser(name: string): string | null {
     const user =  this.users.filter(u => u.name === name || u.user_code === name)[0];
+    debugPrint(` findUser(${name}) => ${user ? user.user_code : null}`);
     return user ? user.user_code : null;
   }
 

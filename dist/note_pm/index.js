@@ -50,6 +50,7 @@ class NotePM {
     }
     findUser(name) {
         const user = this.users.filter(u => u.name === name || u.user_code === name)[0];
+        func_1.debugPrint(` findUser(${name}) => ${user ? user.user_code : null}`);
         return user ? user.user_code : null;
     }
     async fetch(method, path, body) {

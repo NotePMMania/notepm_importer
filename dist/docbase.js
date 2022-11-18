@@ -89,7 +89,7 @@ const options = commander_1.program.opts();
                 tags.push(tag.name);
             }
             catch (e) {
-                func_1.debugPrint(`      タグの作成に失敗しました。既に存在する可能性があります。 ${JSON.stringify(e)}`);
+                func_1.debugPrint(`      タグの作成に失敗しました。既に存在する可能性があります。 ${e.message}`);
             }
         }
         func_1.debugPrint(`    タグ保存完了`);
