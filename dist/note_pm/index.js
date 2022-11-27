@@ -64,29 +64,43 @@ class NotePM {
         const url = `${this.url}${path}`;
         func_1.debugPrint(`${method}: ${url}`);
         func_1.debugPrint(`  body: ${JSON.stringify(body)}`);
-        if (method === 'GET') {
-            const res = await node_fetch_with_proxy_1.default(url, { headers });
-            return await res.json();
-        }
-        if (method === 'POST') {
-            if (!(body instanceof form_data_1.default)) {
-                body = JSON.stringify(body);
+        let retry = 5;
+        while (retry > 0) {
+            try {
+                if (method === 'GET') {
+                    const res = await node_fetch_with_proxy_1.default(url, { headers });
+                    return await res.json();
+                }
+                if (method === 'POST') {
+                    if (!(body instanceof form_data_1.default)) {
+                        body = JSON.stringify(body);
+                    }
+                    const res = await node_fetch_with_proxy_1.default(url, { method, headers, body });
+                    return await res.json();
+                }
+                if (method === 'PATCH') {
+                    if (!(body instanceof form_data_1.default)) {
+                        body = JSON.stringify(body);
+                    }
+                    const res = await node_fetch_with_proxy_1.default(url, { method, headers, body });
+                    return await res.json();
+                }
+                if (method === 'DELETE') {
+                    const res = await node_fetch_with_proxy_1.default(url, { method, headers });
+                    const text = await res.text();
+                    if (text === '')
+                        return {};
+                }
             }
-            const res = await node_fetch_with_proxy_1.default(url, { method, headers, body });
-            return await res.json();
-        }
-        if (method === 'PATCH') {
-            if (!(body instanceof form_data_1.default)) {
-                body = JSON.stringify(body);
+            catch (e) {
+                retry--;
+                if (retry === 0) {
+                    throw e;
+                }
+                func_1.debugPrint(`  リクエストエラー： ${e.message}`);
+                func_1.debugPrint(`  10秒待った後、リトライします ${retry}回`);
+                await sleep(10000);
             }
-            const res = await node_fetch_with_proxy_1.default(url, { method, headers, body });
-            return await res.json();
-        }
-        if (method === 'DELETE') {
-            const res = await node_fetch_with_proxy_1.default(url, { method, headers });
-            const text = await res.text();
-            if (text === '')
-                return {};
         }
     }
 }

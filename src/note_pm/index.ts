@@ -59,28 +59,41 @@ class NotePM {
     const url = `${this.url}${path}`;
     debugPrint(`${method}: ${url}`);
     debugPrint(`  body: ${JSON.stringify(body)}`);
-    if (method === 'GET') {
-      const res = await fetch(url, { headers });
-      return await res.json();
-    }
-    if (method === 'POST') {
-      if (!(body instanceof FormData)) {
-        body = JSON.stringify(body);
+    let retry = 5;
+    while (retry > 0) {
+      try {
+        if (method === 'GET') {
+          const res = await fetch(url, { headers });
+          return await res.json();
+        }
+        if (method === 'POST') {
+          if (!(body instanceof FormData)) {
+            body = JSON.stringify(body);
+          }
+          const res = await fetch(url, { method, headers, body });
+          return await res.json();
+        }
+        if (method === 'PATCH') {
+          if (!(body instanceof FormData)) {
+            body = JSON.stringify(body);
+          }
+          const res = await fetch(url, { method, headers, body });
+          return await res.json();
+        }
+        if (method === 'DELETE') {
+          const res = await fetch(url, { method, headers });
+          const text = await res.text();
+          if (text === '') return {};
+        }
+      } catch (e) {
+        retry--;
+        if (retry === 0) {
+          throw e
+        }
+        debugPrint(`  リクエストエラー： ${e.message}`);
+        debugPrint(`  10秒待った後、リトライします ${retry}回`);
+        await sleep(10000);
       }
-      const res = await fetch(url, { method, headers, body });
-      return await res.json();
-    }
-    if (method === 'PATCH') {
-      if (!(body instanceof FormData)) {
-        body = JSON.stringify(body);
-      }
-      const res = await fetch(url, { method, headers, body });
-      return await res.json();
-    }
-    if (method === 'DELETE') {
-      const res = await fetch(url, { method, headers });
-      const text = await res.text();
-      if (text === '') return {};
     }
   }
 

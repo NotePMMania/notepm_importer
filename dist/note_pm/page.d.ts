@@ -1,0 +1,30 @@
+import Tag from './tag';
+import User from './user';
+import NotePM from './index';
+import QiitaTeam from '../qiita/index';
+declare class Page {
+    static NotePM: NotePM;
+    page_code: string | undefined;
+    note_code: string | undefined;
+    folder_id: number | undefined;
+    title: string;
+    body: string;
+    memo: string;
+    created_at: Date | undefined;
+    updated_at: string | undefined;
+    created_by: User | null;
+    updated_by: User | null;
+    tags: (Tag | string)[];
+    users: User[];
+    user: string | null;
+    constructor(params: notePM_Page);
+    setParams(params: notePM_Page): void;
+    save(): Promise<Page>;
+    create(): Promise<notePM_Page>;
+    update(): Promise<notePM_Page>;
+    hasImage(): boolean;
+    images(): string[];
+    findOrCreate(note: notePM_Note, title: string, body: string, memo: string, tags: string[], folder?: notePM_Folder): Promise<notePM_Page | undefined>;
+    updateImageBody(q: QiitaTeam | null, dir?: string): Promise<void>;
+}
+export default Page;
