@@ -29,8 +29,12 @@ class Page {
         this.note_code = params.note_code;
         this.folder_id = params.folder_id;
         this.title = params.title;
-        this.body = params.body;
-        this.memo = params.memo;
+        if (params.body) {
+            this.body = params.body;
+        }
+        if (params.memo) {
+            this.memo = params.memo;
+        }
         this.created_at = params.created_at;
         this.updated_at = params.updated_at;
         this.user = params.user;
