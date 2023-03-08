@@ -63,7 +63,7 @@ class Docbase {
             const re2 = new RegExp(`https://docbase.io/file_attachments/${name}`, 'g');
             body = body.replace(re2, `../attachments/${fileName}`);
         });
-        body = body.replace(/!\[(.*?)\]\((.*?) =WxH\)/g, "![$1]($2)");
+        body = body.replace(/!\[(.*?)\]\((.*?) =(W|[0-9]+)x(H|[0-9]+)\)/g, "![$1]($2)");
         return body;
     }
 }
